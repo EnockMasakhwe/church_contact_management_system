@@ -15,6 +15,7 @@ public class UserController {
 
     @PostMapping("/contact")
     public User saveUser(@RequestBody User user){
+        System.out.println("Received: " + user.getName());
         return userService.saveUser(user);
     }
 }
