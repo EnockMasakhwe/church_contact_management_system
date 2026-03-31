@@ -15,7 +15,6 @@ public class ContactMessageController {
 
     @PostMapping("/message")
     public ContactMessage saveMessage(@RequestBody ContactMessage contactMessage){
-        System.out.println("Received: " + contactMessage.getName());
         return contactMessageService.saveMessage(contactMessage);
     }
 }

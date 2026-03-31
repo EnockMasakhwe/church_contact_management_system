@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -19,5 +21,8 @@ public class ContactMessage {
     private String email;
     private String phoneNumber;
     private String message;
+    private LocalDateTime createdAt;
+    private String status;
+
 
 }

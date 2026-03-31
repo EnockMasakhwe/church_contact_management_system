@@ -5,6 +5,8 @@ import com.eliarojr.contact_form.repository.ContactMessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class ContactMessageServiceImpl implements ContactMessageService {
 
@@ -13,6 +15,8 @@ public class ContactMessageServiceImpl implements ContactMessageService {
 
     @Override
     public ContactMessage saveMessage(ContactMessage contactMessage) {
+        contactMessage.setCreatedAt(LocalDateTime.now());
+        contactMessage.setStatus("NEW");
         return contactMessageRepository.save(contactMessage);
     }
 }
