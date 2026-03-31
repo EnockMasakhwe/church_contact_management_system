@@ -17,10 +17,11 @@ function submitForm(event) {
     })
         .then(response => response.json())
         .then(data => {
-            alert("Message sent successfully!");
+            document.getElementById("successMessage").innerText = "Message sent successfully!";
+            document.getElementById("contactForm").reset();
             console.log(data);
         })
         .catch(error => {
-            console.error("Error:", error);
+            console.error("Error: Something went wrong!", error);
         });
 }
