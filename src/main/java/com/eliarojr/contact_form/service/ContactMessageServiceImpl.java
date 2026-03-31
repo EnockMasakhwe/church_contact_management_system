@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ContactMessageServiceImpl implements ContactMessageService {
@@ -19,10 +20,47 @@ public class ContactMessageServiceImpl implements ContactMessageService {
 
 
     @Override
-    public ContactMessage saveMessage(ContactMessage contactMessage) {
-        contactMessage.setCreatedAt(LocalDateTime.now());
-        contactMessage.setStatus("NEW");
-        log.info("Saving message from: {}", contactMessage.getEmail());
-        return contactMessageRepository.save(contactMessage);
+    public ContactMessage saveMessage(ContactMessage message) {
+        message.setCreatedAt(LocalDateTime.now());
+        message.setStatus("NEW");
+        log.info("Saving message from: {}", message.getEmail());
+        return contactMessageRepository.save(message);
+    }
+
+    @Override
+    public List<ContactMessage> getAllMessages() {
+        log.info("Fetching all messages from DB");
+        return contactMessageRepository.findAll();
+    }
+
+    @Override
+    public ContactMessage getMessageById(Long id) {
+        log.info("Fetching message from DB by Id");
+        return contactMessageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found!"));
+    }
+
+    @Override
+    public ContactMessage updateMessage(Long id, ContactMessage updatedMessage) {
+        ContactMessage existing = contactMessageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Message not found!"));
+
+        log.info("Message found; updating changes");
+        existing.setName(updatedMessage.getName());
+        existing.setEmail(updatedMessage.getEmail());
+        existing.setPhoneNumber(updatedMessage.getPhoneNumber());
+        existing.setMessage(updatedMessage.getMessage());
+        existing.setStatus(updatedMessage.getStatus());
+
+        return contactMessageRepository.save(existing);
+    }
+
+    @Override
+    public void deleteMessage(Long id) {
+        if (!contactMessageRepository.existsById(id)){
+            throw new RuntimeException("Message not found!");
+        }
+        log.info("Message found; deleting");
+        contactMessageRepository.deleteById(id);
     }
 }

@@ -8,7 +8,7 @@ function submitForm(event) {
         message: document.getElementById("message").value
     };
 
-    fetch("/message", {
+    fetch("/messages", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
