@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Contact Form</title>
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>Contact Us</h2>
 
-<form id="contactForm" onsubmit="submitForm(event)">
-    <input type="text" id="name" placeholder="Your Name" required><br><br>
+<div class="container">
+    <form id="contactForm" onsubmit="submitForm(event)" class="card">
+        <h2>Contact Us</h2>
 
-    <input type="email" id="email" placeholder="Your Email" required><br><br>
+        <input type="text" id="name" placeholder="Your Name" required>
+        <input type="email" id="email" placeholder="Your Email" required>
+        <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+        <textarea id="message" placeholder="Your Message" required></textarea>
 
-    <input type="text" id="phoneNumber" placeholder="Phone Number" required><br><br>
+        <button type="submit">Send Message</button>
 
-    <textarea id="message" placeholder="Your Message" required></textarea><br><br>
-
-    <button type="submit">Send</button>
-</form>
-
-<p id="successMessage" style="color: green"></p>
+        <p id="successMessage"></p>
+    </form>
+</div>
 
 <script src="script.js"></script>
 
