@@ -1,6 +1,7 @@
 package com.eliarojr.contact_form.service;
 
 import com.eliarojr.contact_form.entity.ContactMessage;
+import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.ContactMessageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +38,13 @@ public class ContactMessageServiceImpl implements ContactMessageService {
     public ContactMessage getMessageById(Long id) {
         log.info("Fetching message from DB by Id");
         return contactMessageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Message not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Message not found!"));
     }
 
     @Override
     public ContactMessage updateMessage(Long id, ContactMessage updatedMessage) {
         ContactMessage existing = contactMessageRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Message not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Message not found!"));
 
         log.info("Message found; updating changes");
         existing.setName(updatedMessage.getName());
@@ -58,7 +59,7 @@ public class ContactMessageServiceImpl implements ContactMessageService {
     @Override
     public void deleteMessage(Long id) {
         if (!contactMessageRepository.existsById(id)){
-            throw new RuntimeException("Message not found!");
+            throw new ResourceNotFoundException("Message not found!");
         }
         log.info("Message found; deleting");
         contactMessageRepository.deleteById(id);

@@ -19,14 +19,14 @@ public class ContactMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long messageId;
 
-    @NotBlank
+    @NotBlank(message = "Name is required")
     private String name;
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
-    @NotBlank
+    @NotBlank(message = "Phone number is required")
     private String phoneNumber;
-    @NotBlank
+    @NotBlank(message = "Message is required")
     private String message;
 
     private LocalDateTime createdAt;
