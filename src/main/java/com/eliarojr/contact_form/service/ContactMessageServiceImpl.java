@@ -46,12 +46,15 @@ public class ContactMessageServiceImpl implements ContactMessageService {
         ContactMessage existing = contactMessageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Message not found!"));
 
-        log.info("Message found; updating changes");
-        existing.setName(updatedMessage.getName());
+        log.info("Message found; updating status");
+        if (updatedMessage.getStatus() != null){
+            existing.setStatus(updatedMessage.getStatus());
+        }
+        /*existing.setName(updatedMessage.getName());
         existing.setEmail(updatedMessage.getEmail());
         existing.setPhoneNumber(updatedMessage.getPhoneNumber());
         existing.setMessage(updatedMessage.getMessage());
-        existing.setStatus(updatedMessage.getStatus());
+        existing.setStatus(updatedMessage.getStatus());*/
 
         return contactMessageRepository.save(existing);
     }
