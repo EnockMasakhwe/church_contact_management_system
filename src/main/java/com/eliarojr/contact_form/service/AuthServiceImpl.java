@@ -6,6 +6,7 @@ import com.eliarojr.contact_form.dto.RegisterRequest;
 import com.eliarojr.contact_form.entity.Role;
 import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.repository.UserRepository;
+import com.eliarojr.contact_form.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ public class AuthServiceImpl implements AuthService{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
 
     @Override
     public String register(RegisterRequest request) {
@@ -48,9 +52,10 @@ public class AuthServiceImpl implements AuthService{
             throw new RuntimeException("Invalid credentials");
         }
 
-        // 🔐 Temporary token (replace with JWT later)
-        String token = "dummy-token";
+        //Generate JWT
+        String token = jwtService.generateToken(user.getEmail());
 
+        //Build response
         AuthResponse response = new AuthResponse();
         response.setUsername(user.getUsername());
         response.setToken(token);
