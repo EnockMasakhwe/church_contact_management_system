@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class ContactMessageServiceImpl implements ContactMessageService {
-
+public class ContactMessageServiceImpl implements ContactMessageService{
     @Autowired
     private ContactMessageRepository contactMessageRepository;
 
@@ -67,4 +66,5 @@ public class ContactMessageServiceImpl implements ContactMessageService {
         log.info("Message found; deleting");
         contactMessageRepository.deleteById(id);
     }
+
 }

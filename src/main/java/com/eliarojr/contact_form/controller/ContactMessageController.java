@@ -10,15 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
 @Validated
+@RestController
 public class ContactMessageController {
-
     @Autowired
     private ContactMessageService contactMessageService;
 
     @PostMapping("/messages")
-    public ResponseEntity <ContactMessage> saveMessage(@Valid @RequestBody ContactMessage message){
+    public ResponseEntity<ContactMessage> saveMessage(@Valid @RequestBody ContactMessage message){
         System.out.println("Validation passed");
         ContactMessage saved = contactMessageService.saveMessage(message);
         return ResponseEntity.ok(saved);
@@ -47,4 +46,5 @@ public class ContactMessageController {
         contactMessageService.deleteMessage(id);
         return ResponseEntity.ok("Message deleted successfully!");
     }
+
 }

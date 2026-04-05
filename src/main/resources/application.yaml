@@ -1,15 +1,15 @@
 server:
-    port: 8080
+  port: 8080
 
 spring:
-    datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        username: [REDACTED]
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: [REDACTED]
 
-        url: jdbc:mysql://localhost:3306/contact_form
-        password: [REDACTED]
+    url: jdbc:mysql://localhost:3306/contact_form
+    password: [REDACTED]
 
-    jpa:
-        hibernate:
-            ddl-auto: update
-        show-sql: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
