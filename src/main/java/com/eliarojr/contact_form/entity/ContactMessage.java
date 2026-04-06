@@ -30,7 +30,14 @@ public class ContactMessage {
     private String message;
 
     private LocalDateTime createdAt;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private MessageStatus status;
+
+    @PrePersist
+    protected void onCreate(){
+        createdAt = LocalDateTime.now();
+    }
 
 
 }

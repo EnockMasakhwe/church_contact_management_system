@@ -1,6 +1,7 @@
 package com.eliarojr.contact_form.service;
 
 import com.eliarojr.contact_form.entity.ContactMessage;
+import com.eliarojr.contact_form.entity.MessageStatus;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.ContactMessageRepository;
 import org.slf4j.Logger;
@@ -21,8 +22,6 @@ public class ContactMessageServiceImpl implements ContactMessageService{
 
     @Override
     public ContactMessage saveMessage(ContactMessage message) {
-        message.setCreatedAt(LocalDateTime.now());
-        message.setStatus("NEW");
         log.info("Saving message from: {}", message.getEmail());
         return contactMessageRepository.save(message);
     }
@@ -41,21 +40,14 @@ public class ContactMessageServiceImpl implements ContactMessageService{
     }
 
     @Override
-    public ContactMessage updateMessage(Long id, ContactMessage updatedMessage) {
-        ContactMessage existing = contactMessageRepository.findById(id)
+    public ContactMessage updateStatus(Long id, MessageStatus status) {
+        ContactMessage message = contactMessageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Message not found!"));
 
         log.info("Message found; updating status");
-        if (updatedMessage.getStatus() != null){
-            existing.setStatus(updatedMessage.getStatus());
-        }
-        /*existing.setName(updatedMessage.getName());
-        existing.setEmail(updatedMessage.getEmail());
-        existing.setPhoneNumber(updatedMessage.getPhoneNumber());
-        existing.setMessage(updatedMessage.getMessage());
-        existing.setStatus(updatedMessage.getStatus());*/
+        message.setStatus(status);
 
-        return contactMessageRepository.save(existing);
+        return contactMessageRepository.save(message);
     }
 
     @Override

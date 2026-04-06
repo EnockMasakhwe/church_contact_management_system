@@ -23,28 +23,4 @@ public class ContactMessageController {
         return ResponseEntity.ok(saved);
     }
 
-    @GetMapping("/messages")
-    public ResponseEntity<List<ContactMessage>> getAllMessages(){
-        List<ContactMessage> messages = contactMessageService.getAllMessages();
-        return ResponseEntity.ok(messages);
-    }
-
-    @GetMapping("/messages/{id}")
-    public ResponseEntity<ContactMessage> getMessageById(@PathVariable Long id){
-        ContactMessage message = contactMessageService.getMessageById(id);
-        return  ResponseEntity.ok(message);
-    }
-
-    @PutMapping("/messages/{id}")
-    public ResponseEntity<ContactMessage> updateMessage(@PathVariable Long id, @RequestBody ContactMessage updatedMessage){
-        ContactMessage message = contactMessageService.updateMessage(id, updatedMessage);
-        return ResponseEntity.ok(message);
-    }
-
-    @DeleteMapping("/messages/{id}")
-    public ResponseEntity<String> deleteMessage(@PathVariable Long id){
-        contactMessageService.deleteMessage(id);
-        return ResponseEntity.ok("Message deleted successfully!");
-    }
-
 }
