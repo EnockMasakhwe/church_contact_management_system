@@ -1,4 +1,3 @@
-//Auth check
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
@@ -12,12 +11,15 @@ document.addEventListener("DOMContentLoaded", loadMessages);
 let allMessages = [];
 
 function loadMessages() {
-    fetch("/api/admin/messages", {
+    fetch("http://localhost:8080/api/admin/messages", {
         headers: {
             "Authorization": "Bearer " + token
         }
     })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to load messages");
+            return res.json();
+        })
         .then(data => {
             allMessages = data;
             displayMessages(data);
@@ -32,14 +34,14 @@ function displayMessages(messages) {
     messages.forEach(msg => {
         const row = `
             <tr>
-                <td>${msg.id}</td>
+                <td>${msg.messageId}</td>
                 <td>${msg.name}</td>
                 <td>${msg.email}</td>
                 <td>${msg.message}</td>
                 <td>${msg.status}</td>
                 <td>
-                    <button onclick="markAsRead(${msg.id})">Read</button>
-                    <button onclick="deleteMessage(${msg.id})">Delete</button>
+                    <button onclick="markAsRead(${msg.messageId})">Read</button>
+                    <button onclick="deleteMessage(${msg.messageId})">Delete</button>
                 </td>
             </tr>
         `;
@@ -66,7 +68,7 @@ function filterMessages() {
 }
 
 function deleteMessage(id) {
-    fetch(`/api/admin/messages/${id}`, {
+    fetch(`http://localhost:8080/api/admin/messages/delete/{id}`, {
         method: "DELETE",
         headers: {
             "Authorization": "Bearer " + token
@@ -80,7 +82,7 @@ function deleteMessage(id) {
 }
 
 function markAsRead(id) {
-    fetch(`/api/admin/messages/${id}/status`, {   
+    fetch(`http://localhost:8080/api/admin/messages/status/{id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -95,4 +97,10 @@ function markAsRead(id) {
             loadMessages();
         })
         .catch(error => console.error(error));
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    window.location.href = "login.html";
 }

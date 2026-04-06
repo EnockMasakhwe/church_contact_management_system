@@ -1,3 +1,14 @@
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+
+if (token) {
+    if (role === "ROLE_ADMIN") {
+        window.location.href = "admin.html";
+    } else {
+        window.location.href = "contact.html";
+    }
+}
+
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -9,7 +20,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     };
 
     try {
-        const response = await fetch("/api/auth/register", {
+        const response = await fetch("http://localhost:8080/api/auth/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -29,3 +40,4 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
         alert("Error during registration");
     }
 });
+

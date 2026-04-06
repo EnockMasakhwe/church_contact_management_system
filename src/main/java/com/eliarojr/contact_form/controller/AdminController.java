@@ -22,19 +22,19 @@ public class AdminController {
     }
 
 
-    @GetMapping("/messages/{id}")
+    /* @GetMapping("/messages/{id}")
     public ResponseEntity<ContactMessage> getMessageById(@PathVariable Long id){
         ContactMessage message = contactMessageService.getMessageById(id);
         return  ResponseEntity.ok(message);
-    }
+    } */
 
-    @DeleteMapping("/messages/{id}")
+    @DeleteMapping("/messages/delete/{id}")
     public ResponseEntity<String> deleteMessage(@PathVariable Long id) {
         contactMessageService.deleteMessage(id);
         return ResponseEntity.ok("Message deleted successfully");
     }
 
-    @PutMapping("/messages/{id}/status")
+    @PutMapping("/messages/status/{id}")
     public ResponseEntity<ContactMessage> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
         return ResponseEntity.ok(contactMessageService.updateStatus(id, request.getStatus()));
     }

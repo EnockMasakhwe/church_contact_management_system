@@ -1,4 +1,3 @@
-//Check if user is logged in
 const token = localStorage.getItem("token");
 
 if (!token) {
@@ -16,7 +15,7 @@ function submitForm(event) {
         message: document.getElementById("message").value
     };
 
-    fetch("/api/messages", {
+    fetch("http://localhost:8080/api/messages", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -33,10 +32,15 @@ function submitForm(event) {
         .then(data => {
             document.getElementById("successMessage").innerText = "Message sent successfully!";
             document.getElementById("contactForm").reset();
-            console.log(data);
         })
         .catch(error => {
             console.error("Error:", error);
             alert("Something went wrong!");
         });
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    window.location.href = "login.html";
 }
