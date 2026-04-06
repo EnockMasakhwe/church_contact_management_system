@@ -1,13 +1,28 @@
+//Auth check
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+
+if (!token || role !== "ROLE_ADMIN") {
+    alert("Access denied. Admins only.");
+    window.location.href = "login.html";
+}
+
 document.addEventListener("DOMContentLoaded", loadMessages);
+
 let allMessages = [];
 
 function loadMessages() {
-    fetch("/messages")
+    fetch("/api/admin/messages", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    })
         .then(res => res.json())
         .then(data => {
             allMessages = data;
             displayMessages(data);
-        });
+        })
+        .catch(error => console.error(error));
 }
 
 function displayMessages(messages) {
@@ -17,14 +32,14 @@ function displayMessages(messages) {
     messages.forEach(msg => {
         const row = `
             <tr>
-                <td>${msg.messageId}</td>
+                <td>${msg.id}</td>
                 <td>${msg.name}</td>
                 <td>${msg.email}</td>
                 <td>${msg.message}</td>
                 <td>${msg.status}</td>
                 <td>
-                    <button onclick="markAsRead(${msg.messageId})">Read</button>
-                    <button onclick="deleteMessage(${msg.messageId})">Delete</button>
+                    <button onclick="markAsRead(${msg.id})">Read</button>
+                    <button onclick="deleteMessage(${msg.id})">Delete</button>
                 </td>
             </tr>
         `;
@@ -51,21 +66,25 @@ function filterMessages() {
 }
 
 function deleteMessage(id) {
-    fetch(`/messages/${id}`, {
-        method: "DELETE"
+    fetch(`/api/admin/messages/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
     })
         .then(() => {
             alert("Deleted successfully");
-            loadMessages(); // refresh table
+            loadMessages();
         })
         .catch(error => console.error(error));
 }
 
 function markAsRead(id) {
-    fetch(`/messages/${id}`, {
+    fetch(`/api/admin/messages/${id}/status`, {   
         method: "PUT",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
         },
         body: JSON.stringify({
             status: "READ"

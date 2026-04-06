@@ -32,13 +32,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         //Public endpoints
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
 
                         //User endpoints
-                        .requestMatchers(HttpMethod.POST, "/messages").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/api/messages").hasRole("USER")
 
                         //Admin endpoints
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         //Everything else requires authentication
                         .anyRequest().authenticated()

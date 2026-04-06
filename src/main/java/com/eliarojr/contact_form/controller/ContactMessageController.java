@@ -12,6 +12,7 @@ import java.util.List;
 
 @Validated
 @RestController
+@RequestMapping("/api")
 public class ContactMessageController {
     @Autowired
     private ContactMessageService contactMessageService;
