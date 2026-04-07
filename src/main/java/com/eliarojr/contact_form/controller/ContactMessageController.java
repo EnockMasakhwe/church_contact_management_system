@@ -3,6 +3,7 @@ package com.eliarojr.contact_form.controller;
 import com.eliarojr.contact_form.entity.ContactMessage;
 import com.eliarojr.contact_form.service.ContactMessageService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,9 +14,10 @@ import java.util.List;
 @Validated
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ContactMessageController {
-    @Autowired
-    private ContactMessageService contactMessageService;
+
+    private final ContactMessageService contactMessageService;
 
     @PostMapping("/messages")
     public ResponseEntity<ContactMessage> saveMessage(@Valid @RequestBody ContactMessage message){

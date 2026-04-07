@@ -4,6 +4,7 @@ import com.eliarojr.contact_form.entity.ContactMessage;
 import com.eliarojr.contact_form.entity.MessageStatus;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.ContactMessageRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ContactMessageServiceImpl implements ContactMessageService{
-    @Autowired
-    private ContactMessageRepository contactMessageRepository;
+
+    private final ContactMessageRepository contactMessageRepository;
 
     private final Logger log = LoggerFactory.getLogger(ContactMessageServiceImpl.class);
 

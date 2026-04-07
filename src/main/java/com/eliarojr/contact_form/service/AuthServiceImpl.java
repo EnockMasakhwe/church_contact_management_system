@@ -7,6 +7,7 @@ import com.eliarojr.contact_form.entity.Role;
 import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.security.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtService jwtService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Override
     public String register(RegisterRequest request) {

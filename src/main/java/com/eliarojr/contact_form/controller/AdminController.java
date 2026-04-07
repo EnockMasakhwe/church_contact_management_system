@@ -3,6 +3,7 @@ package com.eliarojr.contact_form.controller;
 import com.eliarojr.contact_form.dto.UpdateStatusRequest;
 import com.eliarojr.contact_form.entity.ContactMessage;
 import com.eliarojr.contact_form.service.ContactMessageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +12,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
+@RequiredArgsConstructor
 public class AdminController {
 
-    @Autowired
-    private ContactMessageService contactMessageService;
+    private final ContactMessageService contactMessageService;
 
     @GetMapping("/messages")
     public ResponseEntity<List<ContactMessage>> getAllMessages(){
