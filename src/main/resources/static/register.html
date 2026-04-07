@@ -1,26 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Registration Page</title>
+    <title>Register</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth.css">
 </head>
 <body>
-<h2>Register</h2>
 
-<form id="registerForm">
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
+<div class="container">
+    <h2>Create Account</h2>
 
-    <select id="role">
-        <option value="ROLE_USER">User</option>
-        <option value="ROLE_ADMIN">Admin</option>
-    </select>
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
 
-    <button type="submit">Register</button>
-</form>
+        <select id="role">
+            <option value="ROLE_USER">User</option>
+            <option value="ROLE_ADMIN">Admin</option>
+        </select>
 
-<p>Already have an account? <a href="login.html">Login</a></p>
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="login.html">Login</a></p>
+</div>
+
 <script src="register.js"></script>
 </body>
 </html>

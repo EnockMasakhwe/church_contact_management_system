@@ -1,53 +1,75 @@
-body {
-    font-family: Arial;
-    background: #f4f6f9;
-    margin: 0;
-}
-
 .container {
-    width: 90%;
-    margin: 30px auto;
+    width: 95%;
+    max-width: 1200px;
+    margin: 60px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 
-h2 {
-    text-align: center;
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-input, select {
-    padding: 10px;
-    margin: 10px;
+.controls {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+thead {
+    background: #4facfe;
+    color: white;
 }
 
 th, td {
     padding: 12px;
-    border-bottom: 1px solid #ddd;
 }
 
-th {
-    background: #667eea;
-    color: white;
+tbody tr {
+    border-bottom: 1px solid #eee;
 }
 
-button {
-    padding: 6px 10px;
+tbody tr:hover {
+    background: #f5f9ff;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
 
-button:first-child {
-    background: green;
+.read-btn {
+    background: #28a745;
     color: white;
 }
 
-button:last-child {
-    background: red;
+.delete-btn {
+    background: #dc3545;
     color: white;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status.NEW {
+    background: #fff3cd;
+}
+
+.status.READ {
+    background: #d4edda;
 }
