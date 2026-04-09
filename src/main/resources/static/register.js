@@ -15,8 +15,7 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     const data = {
         username: document.getElementById("username").value,
         email: document.getElementById("email").value,
-        password: document.getElementById("password").value,
-        role: document.getElementById("role").value
+        password: document.getElementById("password").value
     };
 
     try {
