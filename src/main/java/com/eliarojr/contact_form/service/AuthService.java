@@ -6,6 +6,6 @@ import com.eliarojr.contact_form.dto.RegisterRequest;
 
 public interface AuthService {
     String register(RegisterRequest request);
-
+    String verifyUser(String token);
     AuthResponse login(AuthRequest request);
 }

@@ -34,6 +34,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
     private LocalDateTime createdAt;
+    private boolean enabled = false;
 
     @PrePersist
     protected void onCreate(){
