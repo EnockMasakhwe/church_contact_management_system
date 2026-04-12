@@ -31,32 +31,67 @@ public class EmailService {
         }
     }
 
-    public void sendVerificationEmail(String toEmail, String token){
-        String subject = "Verify your account";
+    public void sendVerificationEmail(String toEmail, String token) {
 
-        String verificationUrl = "http://localhost:8080/api/auth/verify?token=" + token;
+        String verifyLink = "http://localhost:5500/verify.html?token=" + token;
 
-        String message = "Click the link to verify your account:\n" + verificationUrl;
+        String html = """
+        <div style="font-family: Arial; padding: 20px;">
+            <h2 style="color:#2c3e50;">Verify Your Email</h2>
 
-        sendEmail(toEmail, subject, message);
+            <p>Thank you for registering.</p>
 
+            <p>Please verify your email by clicking below:</p>
+
+            <a href="%s"
+               style="display:inline-block;
+                      padding:10px 20px;
+                      background:#2ecc71;
+                      color:white;
+                      text-decoration:none;
+                      border-radius:5px;">
+                Verify Email
+            </a>
+
+            <p style="margin-top:20px; color:gray;">
+                This link expires in 24 hours.
+            </p>
+        </div>
+    """.formatted(verifyLink);
+
+        sendEmail(toEmail, "Verify Your Email", html);
     }
 
     public void sendPasswordResetEmail(String toEmail, String token) {
 
-        String resetLink = "http://localhost:8080/api/auth/reset-password?token=" + token;
+        String resetLink = "http://localhost:5500/reset-password.html?token=" + token;
 
-        String subject = "Password Reset Request";
+        String html = """
+        <div style="font-family: Arial; padding: 20px;">
+            <h2 style="color:#333;">Password Reset Request</h2>
 
-        String body = "Hello,\n\n"
-                + "We received a request to reset your password.\n\n"
-                + "Click the link below to reset your password:\n"
-                + resetLink + "\n\n"
-                + "This link will expire in 30 minutes.\n\n"
-                + "If you did not request this, please ignore this email.\n\n"
-                + "Regards,\n"
-                + "Your Support Team";
+            <p>You requested to reset your password.</p>
 
-        sendEmail(toEmail, subject, body);
+            <p>
+                Click the button below to reset your password:
+            </p>
+
+            <a href="%s"
+               style="display:inline-block;
+                      padding:10px 20px;
+                      background:#e74c3c;
+                      color:white;
+                      text-decoration:none;
+                      border-radius:5px;">
+                Reset Password
+            </a>
+
+            <p style="margin-top:20px; color:gray;">
+                This link will expire in 30 minutes.
+            </p>
+        </div>
+    """.formatted(resetLink);
+
+        sendEmail(toEmail, "Reset Your Password", html);
     }
 }

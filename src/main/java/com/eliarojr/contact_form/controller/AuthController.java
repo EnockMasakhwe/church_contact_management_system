@@ -3,11 +3,14 @@ package com.eliarojr.contact_form.controller;
 import com.eliarojr.contact_form.dto.AuthRequest;
 import com.eliarojr.contact_form.dto.AuthResponse;
 import com.eliarojr.contact_form.dto.RegisterRequest;
+import com.eliarojr.contact_form.dto.ResetPasswordRequest;
 import com.eliarojr.contact_form.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,17 +38,14 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam String email) {
-        authService.createPasswordResetToken(email);
-        return "Password reset link sent to email";
+    public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> request) {
+        authService.createPasswordResetToken(request.get("email"));
+        return ResponseEntity.ok("Password reset link sent to email");
     }
 
     @PostMapping("/reset-password")
-    public String resetPassword(
-            @RequestParam String token,
-            @RequestParam String newPassword
-    ) {
-        authService.resetPassword(token, newPassword);
-        return "Password reset successful";
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Password reset successful");
     }
 }
