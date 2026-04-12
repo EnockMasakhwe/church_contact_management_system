@@ -3,9 +3,11 @@ package com.eliarojr.contact_form.service;
 import com.eliarojr.contact_form.dto.AuthRequest;
 import com.eliarojr.contact_form.dto.AuthResponse;
 import com.eliarojr.contact_form.dto.RegisterRequest;
+import com.eliarojr.contact_form.entity.PasswordResetToken;
 import com.eliarojr.contact_form.entity.Role;
 import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.entity.VerificationToken;
+import com.eliarojr.contact_form.repository.PasswordResetTokenRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.repository.VerificationTokenRepository;
 import com.eliarojr.contact_form.security.JwtService;
@@ -26,6 +28,7 @@ public class AuthServiceImpl implements AuthService{
     private final JwtService jwtService;
     private final VerificationTokenRepository verificationTokenRepository;
     private final EmailService emailService;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Override
     public String register(RegisterRequest request) {
@@ -107,5 +110,43 @@ public class AuthServiceImpl implements AuthService{
         response.setRole(user.getRole());
 
         return response;
+    }
+
+    @Override
+    public void createPasswordResetToken(String email) {
+
+        User user = userRepository.findByEmail(email);
+               // .orElseThrow(() -> new RuntimeException("User not found"));//
+
+        String token = UUID.randomUUID().toString();
+
+        passwordResetTokenRepository.deleteByUser(user);
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
+
+        passwordResetTokenRepository.save(resetToken);
+
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken);
     }
 }

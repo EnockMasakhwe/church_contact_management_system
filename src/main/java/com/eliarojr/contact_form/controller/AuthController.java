@@ -33,4 +33,19 @@ public class AuthController {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@RequestParam String email) {
+        authService.createPasswordResetToken(email);
+        return "Password reset link sent to email";
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword
+    ) {
+        authService.resetPassword(token, newPassword);
+        return "Password reset successful";
+    }
 }
