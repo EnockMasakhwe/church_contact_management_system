@@ -18,7 +18,7 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
 
         try {
-            MimeMessageHelper helper = new MimeMessageHelper(message, true,"UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(toEmail);
             helper.setSubject(subject);
@@ -31,17 +31,16 @@ public class EmailService {
         }
     }
 
+    //EMAIL VERIFICATION (BACKEND DIRECT)
     public void sendVerificationEmail(String toEmail, String token) {
 
-        String verifyLink = "http://localhost:5500/verify.html?token=" + token;
+        String verifyLink = "http://localhost:8080/api/auth/verify?token=" + token;
 
         String html = """
         <div style="font-family: Arial; padding: 20px;">
             <h2 style="color:#2c3e50;">Verify Your Email</h2>
 
-            <p>Thank you for registering.</p>
-
-            <p>Please verify your email by clicking below:</p>
+            <p>Click below to verify your account:</p>
 
             <a href="%s"
                style="display:inline-block;
@@ -57,24 +56,21 @@ public class EmailService {
                 This link expires in 24 hours.
             </p>
         </div>
-    """.formatted(verifyLink);
+        """.formatted(verifyLink);
 
         sendEmail(toEmail, "Verify Your Email", html);
     }
 
+    //RESET PASSWORD (FRONTEND PAGE)
     public void sendPasswordResetEmail(String toEmail, String token) {
 
-        String resetLink = "http://localhost:5500/reset-password.html?token=" + token;
+        String resetLink = "http://localhost:8080/reset-password.html?token=" + token;
 
         String html = """
         <div style="font-family: Arial; padding: 20px;">
-            <h2 style="color:#333;">Password Reset Request</h2>
+            <h2>Password Reset Request</h2>
 
-            <p>You requested to reset your password.</p>
-
-            <p>
-                Click the button below to reset your password:
-            </p>
+            <p>Click below to reset your password:</p>
 
             <a href="%s"
                style="display:inline-block;
@@ -87,10 +83,10 @@ public class EmailService {
             </a>
 
             <p style="margin-top:20px; color:gray;">
-                This link will expire in 30 minutes.
+                This link expires in 30 minutes.
             </p>
         </div>
-    """.formatted(resetLink);
+        """.formatted(resetLink);
 
         sendEmail(toEmail, "Reset Your Password", html);
     }

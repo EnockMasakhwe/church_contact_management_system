@@ -3,10 +3,14 @@ package com.eliarojr.contact_form.repository;
 import com.eliarojr.contact_form.entity.PasswordResetToken;
 import com.eliarojr.contact_form.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
     Optional<PasswordResetToken> findByToken(String token);
-    void deleteByUser(User user);
-}
+    @Modifying
+    @Query("DELETE FROM PasswordResetToken p WHERE p.user = :user")
+    void deleteByUser(@Param("user") User user);}
