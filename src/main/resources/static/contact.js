@@ -51,7 +51,7 @@ function submitForm(event) {
     const user = {
         name: document.getElementById("name").value,
         email: document.getElementById("email").value,
-        phoneNumber: document.getElementById("phoneNumber").value,
+        phone: document.getElementById("phone").value,
         message: document.getElementById("message").value,
         type: type,
         location: location || null,
