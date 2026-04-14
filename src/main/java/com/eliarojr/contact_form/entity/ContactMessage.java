@@ -17,22 +17,25 @@ import java.time.LocalDateTime;
 public class ContactMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long messageId;
+    private Long id;
 
-    @NotBlank(message = "Name is required")
     private String name;
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
     private String email;
-    @NotBlank(message = "Phone number is required")
-    private String phoneNumber;
-    @NotBlank(message = "Message is required")
+    private String phone;
+
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+
     private String message;
 
-    private LocalDateTime createdAt;
+    private String location; // optional
+
+    private LocalDateTime preferredDateTime; // optional
 
     @Enumerated(EnumType.STRING)
     private MessageStatus status;
+
+    private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate(){

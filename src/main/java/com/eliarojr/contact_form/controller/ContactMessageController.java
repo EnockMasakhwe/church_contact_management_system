@@ -1,5 +1,6 @@
 package com.eliarojr.contact_form.controller;
 
+import com.eliarojr.contact_form.dto.ContactMessageRequest;
 import com.eliarojr.contact_form.entity.ContactMessage;
 import com.eliarojr.contact_form.service.ContactMessageService;
 import jakarta.validation.Valid;
@@ -20,9 +21,8 @@ public class ContactMessageController {
     private final ContactMessageService contactMessageService;
 
     @PostMapping("/messages")
-    public ResponseEntity<ContactMessage> saveMessage(@Valid @RequestBody ContactMessage message){
-        System.out.println("Validation passed");
-        ContactMessage saved = contactMessageService.saveMessage(message);
+    public ResponseEntity<ContactMessage> sendMessage(@Valid @RequestBody ContactMessageRequest request){
+        ContactMessage saved = contactMessageService.sendMessage(request);
         return ResponseEntity.ok(saved);
     }
 
