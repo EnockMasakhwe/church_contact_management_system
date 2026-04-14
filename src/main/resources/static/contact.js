@@ -5,14 +5,57 @@ if (!token) {
     window.location.href = "login.html";
 }
 
+// Handle showing/hiding fields
+function handleTypeChange() {
+    const type = document.getElementById("type").value;
+
+    const locationField = document.getElementById("location");
+    const dateField = document.getElementById("preferredDateTime");
+
+    if (type === "VISITATION_REQUEST") {
+        locationField.style.display = "block";
+        dateField.style.display = "block";
+    } else {
+        locationField.style.display = "none";
+        dateField.style.display = "none";
+
+        locationField.value = "";
+        dateField.value = "";
+    }
+}
+
 function submitForm(event) {
     event.preventDefault();
+
+    const type = document.getElementById("type").value;
+    const location = document.getElementById("location").value;
+    const preferredDateTime = document.getElementById("preferredDateTime").value;
+
+    //Frontend validation
+    if (!type) {
+        alert("Please select a request type");
+        return;
+    }
+
+    if (type === "VISITATION_REQUEST") {
+        if (!location) {
+            alert("Location is required for visitation");
+            return;
+        }
+        if (!preferredDateTime) {
+            alert("Date and time is required for visitation");
+            return;
+        }
+    }
 
     const user = {
         name: document.getElementById("name").value,
         email: document.getElementById("email").value,
         phoneNumber: document.getElementById("phoneNumber").value,
-        message: document.getElementById("message").value
+        message: document.getElementById("message").value,
+        type: type,
+        location: location || null,
+        preferredDateTime: preferredDateTime || null
     };
 
     fetch("http://localhost:8080/api/messages", {
@@ -32,6 +75,9 @@ function submitForm(event) {
         .then(data => {
             document.getElementById("successMessage").innerText = "Message sent successfully!";
             document.getElementById("contactForm").reset();
+
+            // Reset hidden fields
+            handleTypeChange();
         })
         .catch(error => {
             console.error("Error:", error);

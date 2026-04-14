@@ -10,13 +10,30 @@
 <button onclick="logout()" class="logout-btn">Logout</button>
 
 <div class="container">
-    <h2>Contact Us</h2>
+    <h2>Contact Elders</h2>
 
     <form id="contactForm" onsubmit="submitForm(event)">
+
         <input type="text" id="name" placeholder="Name" required>
         <input type="email" id="email" placeholder="Email" required>
         <input type="text" id="phoneNumber" placeholder="Phone Number" required>
-        <textarea id="message" placeholder="Your message"></textarea>
+
+        <!-- NEW: Message Type -->
+        <select id="type" required onchange="handleTypeChange()">
+            <option value="">Select Request Type</option>
+            <option value="VISITATION_REQUEST">Visitation Request</option>
+            <option value="PRAYER_REQUEST">Prayer Request</option>
+            <option value="BEREAVEMENT">Bereavement</option>
+            <option value="GENERAL">General</option>
+        </select>
+
+        <!-- CONDITIONAL FIELD: Location -->
+        <input type="text" id="location" placeholder="Location (for visitation)" style="display:none;">
+
+        <!-- CONDITIONAL FIELD: Date & Time -->
+        <input type="datetime-local" id="preferredDateTime" style="display:none;">
+
+        <textarea id="message" placeholder="Your message" required></textarea>
 
         <button type="submit">Send Message</button>
     </form>
