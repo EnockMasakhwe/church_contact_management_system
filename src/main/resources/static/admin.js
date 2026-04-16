@@ -34,14 +34,17 @@ function displayMessages(messages) {
     messages.forEach(msg => {
         const row = `
             <tr>
-                <td>${msg.messageId}</td>
+                <td>${msg.id}</td>
                 <td>${msg.name}</td>
                 <td>${msg.email}</td>
+                <td>${msg.type}</td>
                 <td>${msg.message}</td>
+                <td>${msg.location || "-"}</td>
+                <td>${formatDate(msg.preferredDateTime)}</td>
                 <td>${msg.status}</td>
                 <td>
-                    <button onclick="markAsRead(${msg.messageId})">Read</button>
-                    <button onclick="deleteMessage(${msg.messageId})">Delete</button>
+                    <button onclick="markAsRead(${msg.id})">Read</button>
+                    <button onclick="deleteMessage(${msg.id})">Delete</button>
                 </td>
             </tr>
         `;
@@ -49,9 +52,16 @@ function displayMessages(messages) {
     });
 }
 
+// Format date nicely
+function formatDate(date) {
+    if (!date) return "-";
+    return new Date(date).toLocaleString();
+}
+
 function filterMessages() {
     const search = document.getElementById("searchInput").value.toLowerCase();
     const status = document.getElementById("statusFilter").value;
+    const type = document.getElementById("typeFilter").value;
 
     let filtered = allMessages.filter(msg => {
         const matchesSearch =
@@ -61,14 +71,17 @@ function filterMessages() {
         const matchesStatus =
             status === "" || msg.status === status;
 
-        return matchesSearch && matchesStatus;
+        const matchesType =
+            type === "" || msg.type === type;
+
+        return matchesSearch && matchesStatus && matchesType;
     });
 
     displayMessages(filtered);
 }
 
 function deleteMessage(id) {
-    fetch(`http://localhost:8080/api/admin/messages/delete/{id}`, {
+    fetch(`http://localhost:8080/api/admin/messages/delete/${id}`, {
         method: "DELETE",
         headers: {
             "Authorization": "Bearer " + token
@@ -82,7 +95,7 @@ function deleteMessage(id) {
 }
 
 function markAsRead(id) {
-    fetch(`http://localhost:8080/api/admin/messages/status/{id}`, {
+    fetch(`http://localhost:8080/api/admin/messages/status/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",

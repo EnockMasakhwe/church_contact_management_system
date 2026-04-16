@@ -23,6 +23,14 @@
             <option value="NEW">NEW</option>
             <option value="READ">READ</option>
         </select>
+
+        <select id="typeFilter" onchange="filterMessages()">
+            <option value="">All Types</option>
+            <option value="VISITATION_REQUEST">Visitation</option>
+            <option value="PRAYER_REQUEST">Prayer</option>
+            <option value="BEREAVEMENT">Bereavement</option>
+            <option value="GENERAL">General</option>
+        </select>
     </div>
 
     <table>
@@ -31,7 +39,10 @@
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Type</th>
             <th>Message</th>
+            <th>Location</th>
+            <th>Date/Time</th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
