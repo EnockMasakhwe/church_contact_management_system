@@ -1,9 +1,12 @@
 package com.eliarojr.contact_form.service;
 
 import com.eliarojr.contact_form.dto.ContactMessageRequest;
+import com.eliarojr.contact_form.entity.Appointment;
+import com.eliarojr.contact_form.entity.AppointmentStatus;
 import com.eliarojr.contact_form.entity.ContactMessage;
 import com.eliarojr.contact_form.entity.MessageStatus;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
+import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.ContactMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.eliarojr.contact_form.entity.MessageType.VISITATION_REQUEST;
 import static org.hibernate.internal.util.StringHelper.isBlank;
 
 @Service
@@ -20,6 +24,7 @@ import static org.hibernate.internal.util.StringHelper.isBlank;
 public class ContactMessageServiceImpl implements ContactMessageService{
 
     private final ContactMessageRepository contactMessageRepository;
+    private final AppointmentRepository appointmentRepository;
 
     private final Logger log = LoggerFactory.getLogger(ContactMessageServiceImpl.class);
 
@@ -59,6 +64,27 @@ public class ContactMessageServiceImpl implements ContactMessageService{
         message.setPreferredDateTime(request.getPreferredDateTime());
         message.setStatus(MessageStatus.NEW);
         message.setCreatedAt(LocalDateTime.now());
+
+        if (request.getType() == VISITATION_REQUEST) {
+
+            LocalDateTime start = request.getPreferredDateTime();
+            LocalDateTime end = start.plusHours(1);
+
+            boolean conflict = appointmentRepository
+                    .existsByStartTimeLessThanEqualAndEndTimeGreaterThanEqual(end, start);
+
+            if (conflict) {
+                throw new RuntimeException("Time slot already booked");
+            }
+
+            Appointment appointment = new Appointment();
+            appointment.setStartTime(start);
+            appointment.setEndTime(end);
+            appointment.setStatus(AppointmentStatus.PENDING);
+            appointment.setMessage(message);
+
+            appointmentRepository.save(appointment);
+        }
 
         return contactMessageRepository.save(message);
     }
