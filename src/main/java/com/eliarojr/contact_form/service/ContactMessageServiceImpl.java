@@ -28,9 +28,28 @@ public class ContactMessageServiceImpl implements ContactMessageService{
 
     private final Logger log = LoggerFactory.getLogger(ContactMessageServiceImpl.class);
 
+    private ContactMessage mapToEntity(ContactMessageRequest request) {
+
+        ContactMessage message = new ContactMessage();
+
+        message.setName(request.getName());
+        message.setEmail(request.getEmail());
+        message.setPhone(request.getPhone());
+        message.setMessage(request.getMessage());
+        message.setType(request.getType());
+        message.setStatus(MessageStatus.NEW);
+        message.setCreatedAt(LocalDateTime.now());
+
+        message.setLocation(request.getLocation());
+        message.setPreferredDateTime(request.getPreferredDateTime());
+
+        return message;
+    }
+
 
     @Override
     public ContactMessage sendMessage(ContactMessageRequest request) {
+
         log.info("Saving message from: {}", request.getEmail());
 
         switch (request.getType()) {
@@ -42,51 +61,35 @@ public class ContactMessageServiceImpl implements ContactMessageService{
                 if (request.getPreferredDateTime() == null) {
                     throw new IllegalArgumentException("Date/time required");
                 }
-            }
 
-            case PRAYER_REQUEST -> {
-                // Optional: allow date but not required
-            }
+                LocalDateTime start = request.getPreferredDateTime();
+                LocalDateTime end = start.plusHours(1);
 
-            case BEREAVEMENT, GENERAL -> {
-                // No extra fields needed
+                List<Appointment> conflicts =
+                        appointmentRepository.findConflictingAppointments(start, end);
+
+                if (!conflicts.isEmpty()) {
+                    throw new RuntimeException("Time slot already booked");
+                }
             }
         }
 
-        ContactMessage message = new ContactMessage();
-
-        message.setName(request.getName());
-        message.setEmail(request.getEmail());
-        message.setPhone(request.getPhone());
-        message.setType(request.getType());
-        message.setMessage(request.getMessage());
-        message.setLocation(request.getLocation());
-        message.setPreferredDateTime(request.getPreferredDateTime());
-        message.setStatus(MessageStatus.NEW);
-        message.setCreatedAt(LocalDateTime.now());
+        ContactMessage savedMessage = contactMessageRepository.save(mapToEntity(request));
 
         if (request.getType() == VISITATION_REQUEST) {
 
             LocalDateTime start = request.getPreferredDateTime();
-            LocalDateTime end = start.plusHours(1);
-
-            boolean conflict = appointmentRepository
-                    .existsByStartTimeLessThanEqualAndEndTimeGreaterThanEqual(end, start);
-
-            if (conflict) {
-                throw new RuntimeException("Time slot already booked");
-            }
 
             Appointment appointment = new Appointment();
             appointment.setStartTime(start);
-            appointment.setEndTime(end);
-            appointment.setStatus(AppointmentStatus.PENDING);
-            appointment.setMessage(message);
+            appointment.setEndTime(start.plusHours(1));
+            appointment.setStatus(AppointmentStatus.BOOKED);
+            appointment.setMessage(savedMessage);
 
             appointmentRepository.save(appointment);
         }
 
-        return contactMessageRepository.save(message);
+        return savedMessage;
     }
 
     @Override
