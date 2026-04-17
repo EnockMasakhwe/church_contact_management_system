@@ -18,7 +18,7 @@
         <input type="email" id="email" placeholder="Email" required>
         <input type="text" id="phone" placeholder="Phone Number" required>
 
-        <!-- NEW: Message Type -->
+        <!-- Request Type -->
         <select id="type" required onchange="handleTypeChange()">
             <option value="">Select Request Type</option>
             <option value="VISITATION_REQUEST">Visitation Request</option>
@@ -27,11 +27,17 @@
             <option value="GENERAL">General</option>
         </select>
 
-        <!-- CONDITIONAL FIELD: Location -->
+        <!-- Location -->
         <input type="text" id="location" placeholder="Location (for visitation)" style="display:none;">
 
-        <!-- CONDITIONAL FIELD: Date & Time -->
-        <input type="datetime-local" id="preferredDateTime" style="display:none;">
+        <!-- Calendar -->
+        <div id="calendarContainer" style="display:none;">
+            <h3>Select Preferred Time</h3>
+            <div id="calendar"></div>
+        </div>
+
+        <!-- Hidden input for backend -->
+        <input type="hidden" id="preferredDateTime">
 
         <textarea id="message" placeholder="Your message" required></textarea>
 
