@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Contact</title>
+    <title>Contact Elders</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="contact.css">
 </head>
@@ -9,42 +9,45 @@
 
 <button onclick="logout()" class="logout-btn">Logout</button>
 
-<div class="container">
-    <h2>Contact Elders</h2>
+<div class="main-layout">
 
-    <form id="contactForm" onsubmit="submitForm(event)">
+    <!-- FORM -->
+    <div class="form-container">
+        <h2>Contact Elders</h2>
 
-        <input type="text" id="name" placeholder="Name" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="text" id="phone" placeholder="Phone Number" required>
+        <form id="contactForm" onsubmit="submitForm(event)">
 
-        <!-- Request Type -->
-        <select id="type" required onchange="handleTypeChange()">
-            <option value="">Select Request Type</option>
-            <option value="VISITATION_REQUEST">Visitation Request</option>
-            <option value="PRAYER_REQUEST">Prayer Request</option>
-            <option value="BEREAVEMENT">Report Bereavement</option>
-            <option value="GENERAL">General</option>
-        </select>
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="text" id="phone" placeholder="Phone Number" required>
 
-        <!-- Location -->
-        <input type="text" id="location" placeholder="Location (for visitation)" style="display:none;">
+            <select id="type" required onchange="handleTypeChange()">
+                <option value="">Select Request Type</option>
+                <option value="VISITATION_REQUEST">Visitation Request</option>
+                <option value="PRAYER_REQUEST">Prayer Request</option>
+                <option value="BEREAVEMENT">Report Bereavement</option>
+                <option value="GENERAL">General</option>
+            </select>
 
-        <!-- Calendar -->
-        <div id="calendarContainer" style="display:none;">
-            <h3>Select Preferred Time</h3>
-            <div id="calendar"></div>
-        </div>
+            <input type="text" id="location" placeholder="Location (for visitation)" style="display:none;">
 
-        <!-- Hidden input for backend -->
-        <input type="hidden" id="preferredDateTime">
+            <!-- Hidden datetime -->
+            <input type="hidden" id="preferredDateTime">
 
-        <textarea id="message" placeholder="Your message" required></textarea>
+            <textarea id="message" placeholder="Your message" required></textarea>
 
-        <button type="submit">Send Message</button>
-    </form>
+            <button type="submit">Send Message</button>
+        </form>
 
-    <p id="successMessage"></p>
+        <p id="successMessage"></p>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="calendar-container" id="calendarSection" style="display:none;">
+        <h3>Select Preferred Time</h3>
+        <div id="calendar"></div>
+    </div>
+
 </div>
 
 <script src="contact.js"></script>

@@ -5,36 +5,32 @@ if (!token) {
     window.location.href = "login.html";
 }
 
-// Track selected slot
-let selectedSlotElement = null;
+/* ======================
+   FORM LOGIC
+====================== */
 
-// Handle UI changes
 function handleTypeChange() {
     const type = document.getElementById("type").value;
 
     const locationField = document.getElementById("location");
-    const calendarContainer = document.getElementById("calendarContainer");
+    const calendarSection = document.getElementById("calendarSection");
 
     if (type === "VISITATION_REQUEST") {
         locationField.style.display = "block";
-        calendarContainer.style.display = "block";
-
-        loadCalendar(); // load slots only when needed
+        calendarSection.style.display = "block";
     } else {
+        if (selectedSlot) {
+            selectedSlot.classList.remove("selected");
+            selectedSlot = null;
+        }
         locationField.style.display = "none";
-        calendarContainer.style.display = "none";
+        calendarSection.style.display = "none";
 
         locationField.value = "";
         document.getElementById("preferredDateTime").value = "";
-
-        if (selectedSlotElement) {
-            selectedSlotElement.classList.remove("selected");
-            selectedSlotElement = null;
-        }
     }
 }
 
-// Submit form
 function submitForm(event) {
     event.preventDefault();
 
@@ -49,11 +45,11 @@ function submitForm(event) {
 
     if (type === "VISITATION_REQUEST") {
         if (!location) {
-            alert("Location is required for visitation");
+            alert("Location is required");
             return;
         }
         if (!preferredDateTime) {
-            alert("Please select a time from the calendar");
+            alert("Please select a time from calendar");
             return;
         }
     }
@@ -63,7 +59,7 @@ function submitForm(event) {
         email: document.getElementById("email").value,
         phone: document.getElementById("phone").value,
         message: document.getElementById("message").value,
-        type: type,
+        type,
         location: location || null,
         preferredDateTime: preferredDateTime || null
     };
@@ -76,33 +72,27 @@ function submitForm(event) {
         },
         body: JSON.stringify(user)
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Error occurred");
-            }
-            return response.json();
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
         })
         .then(() => {
             document.getElementById("successMessage").innerText = "Message sent successfully!";
             document.getElementById("contactForm").reset();
-
-            handleTypeChange(); // reset UI
         })
-        .catch(error => {
-            console.error(error);
-            alert("Something went wrong!");
-        });
+        .catch(() => alert("Something went wrong"));
 }
 
-// Load calendar data
+/* ======================
+   CALENDAR LOGIC
+====================== */
+
 async function loadCalendar() {
     const res = await fetch("http://localhost:8080/api/appointments");
     const appointments = await res.json();
-
     renderCalendar(appointments);
 }
 
-// Render calendar
 function renderCalendar(appointments) {
     const calendar = document.getElementById("calendar");
     calendar.innerHTML = "";
@@ -122,7 +112,7 @@ function renderCalendar(appointments) {
 
         column.appendChild(header);
 
-        for (let hour = 8; hour <= 17; hour++) {
+        for (let hour = 8; hour <= 18; hour++) {
             const slotTime = new Date(day);
             slotTime.setHours(hour, 0, 0, 0);
 
@@ -130,12 +120,16 @@ function renderCalendar(appointments) {
             slot.className = "time-slot";
             slot.innerText = `${hour}:00`;
 
+            const isPast = slotTime < now;
+
             const isBooked = appointments.some(a => {
                 const start = new Date(a.startTime);
                 return start.getTime() === slotTime.getTime();
             });
 
-            if (isBooked) {
+            if (isPast) {
+                slot.classList.add("past");
+            } else if (isBooked) {
                 slot.classList.add("booked");
             } else {
                 slot.onclick = () => selectSlot(slotTime, slot);
@@ -148,19 +142,27 @@ function renderCalendar(appointments) {
     }
 }
 
-// Select slot
+let selectedSlot = null;
+
 function selectSlot(dateTime, element) {
-    if (selectedSlotElement) {
-        selectedSlotElement.classList.remove("selected");
+    if (selectedSlot) {
+        selectedSlot.classList.remove("selected");
     }
 
     element.classList.add("selected");
-    selectedSlotElement = element;
+    selectedSlot = element;
 
-    document.getElementById("preferredDateTime").value = dateTime.toISOString();
+    // Fix format for backend
+    const formatted = dateTime.toISOString().slice(0,16);
+    document.getElementById("preferredDateTime").value = formatted;
 }
 
-// Logout
+document.addEventListener("DOMContentLoaded", loadCalendar);
+
+/* ======================
+   LOGOUT
+====================== */
+
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("role");

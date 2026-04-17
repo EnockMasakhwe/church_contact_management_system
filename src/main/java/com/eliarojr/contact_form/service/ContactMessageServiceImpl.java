@@ -83,7 +83,7 @@ public class ContactMessageServiceImpl implements ContactMessageService{
             Appointment appointment = new Appointment();
             appointment.setStartTime(start);
             appointment.setEndTime(start.plusHours(1));
-            appointment.setStatus(AppointmentStatus.BOOKED);
+            appointment.setStatus(AppointmentStatus.PENDING);
             appointment.setMessage(savedMessage);
 
             appointmentRepository.save(appointment);
