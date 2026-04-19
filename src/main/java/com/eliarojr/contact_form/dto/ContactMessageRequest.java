@@ -1,6 +1,6 @@
 package com.eliarojr.contact_form.dto;
 
-import com.eliarojr.contact_form.entity.MessageType;
+import com.eliarojr.contact_form.entity.enums.MessageType;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

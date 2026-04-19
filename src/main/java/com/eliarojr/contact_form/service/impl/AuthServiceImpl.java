@@ -1,19 +1,20 @@
-package com.eliarojr.contact_form.service;
+package com.eliarojr.contact_form.service.impl;
 
 import com.eliarojr.contact_form.dto.AuthRequest;
 import com.eliarojr.contact_form.dto.AuthResponse;
 import com.eliarojr.contact_form.dto.RegisterRequest;
 import com.eliarojr.contact_form.entity.PasswordResetToken;
-import com.eliarojr.contact_form.entity.Role;
+import com.eliarojr.contact_form.entity.enums.Role;
 import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.entity.VerificationToken;
 import com.eliarojr.contact_form.repository.PasswordResetTokenRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.repository.VerificationTokenRepository;
 import com.eliarojr.contact_form.security.JwtService;
+import com.eliarojr.contact_form.service.AuthService;
+import com.eliarojr.contact_form.service.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

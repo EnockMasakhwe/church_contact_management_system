@@ -1,5 +1,6 @@
 package com.eliarojr.contact_form.entity;
 
+import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,7 +1,6 @@
 package com.eliarojr.contact_form.dto;
 
-import com.eliarojr.contact_form.entity.Role;
-import lombok.AllArgsConstructor;
+import com.eliarojr.contact_form.entity.enums.Role;
 import lombok.Data;
 
 @Data
