@@ -1,8 +1,9 @@
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
-if (!token || role !== "ROLE_ADMIN") {
-    alert("Access denied. Admins only.");
+//Allow ADMIN + SUPER_ADMIN
+if (!token || (role !== "ROLE_ADMIN" && role !== "ROLE_SUPER_ADMIN")) {
+    alert("Access denied.");
     window.location.href = "login.html";
 }
 
@@ -32,6 +33,9 @@ function displayMessages(messages) {
     table.innerHTML = "";
 
     messages.forEach(msg => {
+
+        const actions = buildActions(msg);
+
         const row = `
             <tr>
                 <td>${msg.id}</td>
@@ -41,15 +45,62 @@ function displayMessages(messages) {
                 <td>${msg.message}</td>
                 <td>${msg.location || "-"}</td>
                 <td>${formatDate(msg.preferredDateTime)}</td>
-                <td>${msg.status}</td>
-                <td>
-                    <button onclick="markAsRead(${msg.id})">Read</button>
-                    <button onclick="deleteMessage(${msg.id})">Delete</button>
-                </td>
+                <td><span class="status ${msg.status}">${msg.status}</span></td>
+                <td>${actions}</td>
             </tr>
         `;
         table.innerHTML += row;
     });
+}
+
+//Smart actions based on status
+function buildActions(msg) {
+    let buttons = "";
+
+    if (msg.status === "NEW") {
+        buttons += `<button class="action-btn read-btn" onclick="updateStatus(${msg.id}, 'READ')">Mark Read</button>`;
+    }
+
+    if (msg.status === "READ") {
+        buttons += `<button class="action-btn respond-btn" onclick="updateStatus(${msg.id}, 'RESPONDED')">Mark Responded</button>`;
+    }
+
+    buttons += `<button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">Delete</button>`;
+
+    return buttons;
+}
+
+// Update status (READ / RESPONDED)
+function updateStatus(id, status) {
+    fetch(`http://localhost:8080/api/admin/messages/{id}/status`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ status })
+    })
+        .then(() => {
+            alert(`Marked as ${status}`);
+            loadMessages();
+        })
+        .catch(error => console.error(error));
+}
+
+function deleteMessage(id) {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+
+    fetch(`http://localhost:8080/api/admin/messages/{id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    })
+        .then(() => {
+            alert("Deleted successfully");
+            loadMessages();
+        })
+        .catch(error => console.error(error));
 }
 
 // Format date nicely
@@ -78,38 +129,6 @@ function filterMessages() {
     });
 
     displayMessages(filtered);
-}
-
-function deleteMessage(id) {
-    fetch(`http://localhost:8080/api/admin/messages/delete/${id}`, {
-        method: "DELETE",
-        headers: {
-            "Authorization": "Bearer " + token
-        }
-    })
-        .then(() => {
-            alert("Deleted successfully");
-            loadMessages();
-        })
-        .catch(error => console.error(error));
-}
-
-function markAsRead(id) {
-    fetch(`http://localhost:8080/api/admin/messages/status/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({
-            status: "READ"
-        })
-    })
-        .then(() => {
-            alert("Marked as READ");
-            loadMessages();
-        })
-        .catch(error => console.error(error));
 }
 
 function logout() {

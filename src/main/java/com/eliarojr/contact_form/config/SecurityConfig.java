@@ -42,7 +42,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/messages").hasRole("USER")
 
                         //Admin endpoints
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN","SUPER_ADMIN")
+                        .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
 
                         //Everything else requires authentication
                         .anyRequest().authenticated()

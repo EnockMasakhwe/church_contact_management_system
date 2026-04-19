@@ -31,13 +31,13 @@ public class AdminController {
         return  ResponseEntity.ok(message);
     } */
 
-    @DeleteMapping("/messages/delete/{id}")
+    @DeleteMapping("/messages/{id}")
     public ResponseEntity<String> deleteMessage(@PathVariable Long id) {
         adminService.deleteMessage(id);
         return ResponseEntity.ok("Message deleted successfully");
     }
 
-    @PutMapping("/messages/status/{id}")
+    @PutMapping("/messages/{id}/status")
     public ResponseEntity<ContactMessage> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
         return ResponseEntity.ok(adminService.updateStatus(id, request.getStatus()));
     }

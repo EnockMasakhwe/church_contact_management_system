@@ -42,15 +42,23 @@ tbody tr:hover {
     background: #f5f9ff;
 }
 
+/* Buttons */
 .action-btn {
-    padding: 6px 12px;
+    padding: 6px 10px;
+    margin: 2px;
     border-radius: 6px;
     border: none;
     cursor: pointer;
+    font-size: 12px;
 }
 
 .read-btn {
     background: #28a745;
+    color: white;
+}
+
+.respond-btn {
+    background: #17a2b8;
     color: white;
 }
 
@@ -59,6 +67,7 @@ tbody tr:hover {
     color: white;
 }
 
+/* Status badges */
 .status {
     padding: 5px 10px;
     border-radius: 20px;
@@ -68,8 +77,15 @@ tbody tr:hover {
 
 .status.NEW {
     background: #fff3cd;
+    color: #856404;
 }
 
 .status.READ {
     background: #d4edda;
+    color: #155724;
+}
+
+.status.RESPONDED {
+    background: #cce5ff;
+    color: #004085;
 }
