@@ -32,6 +32,7 @@ thead {
 
 th, td {
     padding: 12px;
+    text-align: center;
 }
 
 tbody tr {
@@ -57,8 +58,18 @@ tbody tr:hover {
     color: white;
 }
 
+.progress-btn {
+    background: #ffc107;
+    color: black;
+}
+
 .respond-btn {
     background: #17a2b8;
+    color: white;
+}
+
+.close-btn {
+    background: #6c757d;
     color: white;
 }
 
@@ -75,6 +86,7 @@ tbody tr:hover {
     font-weight: bold;
 }
 
+/* Status colors */
 .status.NEW {
     background: #fff3cd;
     color: #856404;
@@ -85,7 +97,17 @@ tbody tr:hover {
     color: #155724;
 }
 
+.status.IN_PROGRESS {
+    background: #ffeeba;
+    color: #856404;
+}
+
 .status.RESPONDED {
     background: #cce5ff;
     color: #004085;
+}
+
+.status.CLOSED {
+    background: #e2e3e5;
+    color: #383d41;
 }
