@@ -88,7 +88,7 @@ function submitForm(event) {
 ====================== */
 
 async function loadCalendar() {
-    const res = await fetch("http://localhost:8080/api/appointments");
+    const res = await fetch("http://localhost:8080/api/appointments/public");
     const appointments = await res.json();
     renderCalendar(appointments);
 }
@@ -124,7 +124,10 @@ function renderCalendar(appointments) {
 
             const isBooked = appointments.some(a => {
                 const start = new Date(a.startTime);
-                return start.getTime() === slotTime.getTime();
+                return (
+                    start.getTime() === slotTime.getTime() &&
+                    (a.status === "PENDING" || a.status === "APPROVED")
+                );
             });
 
             if (isPast) {

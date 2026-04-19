@@ -111,3 +111,23 @@ tbody tr:hover {
     background: #e2e3e5;
     color: #383d41;
 }
+
+.status.PENDING {
+    background: #ffeeba;
+    color: #856404;
+}
+
+.status.APPROVED {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status.REJECTED {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status.COMPLETED {
+    background: #cce5ff;
+    color: #004085;
+}

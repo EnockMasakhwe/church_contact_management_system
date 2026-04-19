@@ -35,8 +35,8 @@ public class SecurityConfig {
                         //Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        //Calendar endpoint
-                        .requestMatchers(HttpMethod.GET, "/api/appointments").permitAll()
+                        //Public Calendar endpoint
+                        .requestMatchers(HttpMethod.GET, "/api/appointments/public").permitAll()
 
                         //User endpoints
                         .requestMatchers(HttpMethod.POST, "/api/messages").hasRole("USER")

@@ -157,6 +157,89 @@ function formatDate(date) {
     return new Date(date).toLocaleString();
 }
 
+function loadAppointments() {
+    fetch("http://localhost:8080/api/admin/appointments", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to load appointments");
+            return res.json();
+        })
+        .then(data => displayAppointments(data))
+        .catch(err => {
+            console.error(err);
+            alert("Failed to load appointments");
+        });
+}
+
+function displayAppointments(appointments) {
+    const table = document.getElementById("appointmentTable");
+    table.innerHTML = "";
+
+    if (appointments.length === 0) {
+        table.innerHTML = `<tr><td colspan="8">No appointments found</td></tr>`;
+        return;
+    }
+
+    appointments.forEach(app => {
+
+        const row = `
+            <tr>
+                <td>${app.id}</td>
+                <td>${app.name || "-"}</td>
+                <td>${app.email || "-"}</td>
+                <td>${app.message || "-"}</td>
+                <td>${formatDate(app.startTime)}</td>
+                <td>${formatDate(app.endTime)}</td>
+                <td><span class="status ${app.status}">${app.status}</span></td>
+                <td>${buildAppointmentActions(app)}</td>
+            </tr>
+        `;
+
+        table.innerHTML += row;
+    });
+}
+
+function buildAppointmentActions(app) {
+    let buttons = "";
+
+    if (app.status === "PENDING") {
+        buttons += `<button onclick="updateAppointmentStatus(${app.id}, 'APPROVED')">Approve</button>`;
+        buttons += `<button onclick="updateAppointmentStatus(${app.id}, 'REJECTED')">Reject</button>`;
+    }
+
+    if (app.status === "APPROVED") {
+        buttons += `<button onclick="updateAppointmentStatus(${app.id}, 'COMPLETED')">Complete</button>`;
+    }
+
+    return buttons || "-";
+}
+
+function updateAppointmentStatus(id, status) {
+    fetch(`http://localhost:8080/api/admin/appointments/${id}/status?status=${status}`, {
+        method: "PUT",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("Update failed");
+            alert(`Appointment ${status}`);
+            loadAppointments();
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error updating appointment");
+        });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadMessages();
+    loadAppointments();
+});
+
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("role");

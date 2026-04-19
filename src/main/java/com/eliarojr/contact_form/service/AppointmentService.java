@@ -1,6 +1,9 @@
 package com.eliarojr.contact_form.service;
 
 import com.eliarojr.contact_form.dto.AppointmentResponse;
+import com.eliarojr.contact_form.entity.Appointment;
+import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
+import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,15 +16,55 @@ public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
 
+    // Admin calendar view (FULL DETAILS)
     public List<AppointmentResponse> getAllAppointments() {
 
         return appointmentRepository.findAllByOrderByStartTimeAsc()
                 .stream()
                 .map(a -> new AppointmentResponse(
+                        a.getId(),
                         a.getStartTime(),
                         a.getEndTime(),
-                        a.getStatus().name()
+                        a.getStatus().name(),
+
+                        a.getMessage() != null ? a.getMessage().getName() : "Unknown",
+                        a.getMessage() != null ? a.getMessage().getEmail() : "N/A",
+                        a.getMessage() != null ? a.getMessage().getMessage() : "-"
                 ))
                 .toList();
+    }
+
+
+    // Public calendar view
+    public List<AppointmentResponse> getPublicAppointments() {
+
+        return appointmentRepository.findAllByOrderByStartTimeAsc()
+                .stream()
+                .filter(a ->
+                        a.getStatus() == AppointmentStatus.PENDING ||
+                                a.getStatus() == AppointmentStatus.APPROVED
+                )
+                .map(a -> new AppointmentResponse(
+                        a.getId(),
+                        a.getStartTime(),
+                        a.getEndTime(),
+                        a.getStatus().name(),
+
+                        null, // 🔒 hide sensitive data
+                        null,
+                        null
+                ))
+                .toList();
+    }
+
+    // UPDATE STATUS
+    public Appointment updateStatus(Long id, AppointmentStatus status) {
+
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        appointment.setStatus(status);
+
+        return appointmentRepository.save(appointment);
     }
 }
