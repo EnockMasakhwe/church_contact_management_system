@@ -44,9 +44,6 @@ public class ContactMessage {
         createdAt = LocalDateTime.now();
     }
 
-    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL)
-    private List<Appointment> appointments = new ArrayList<>();
-
 
 }
 
