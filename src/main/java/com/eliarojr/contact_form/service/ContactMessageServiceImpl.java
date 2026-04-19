@@ -8,6 +8,7 @@ import com.eliarojr.contact_form.entity.MessageStatus;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.ContactMessageRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class ContactMessageServiceImpl implements ContactMessageService{
     }
 
 
+    @Transactional
     @Override
     public ContactMessage sendMessage(ContactMessageRequest request) {
 
@@ -72,11 +74,24 @@ public class ContactMessageServiceImpl implements ContactMessageService{
                     throw new RuntimeException("Time slot already booked");
                 }
             }
+
+            case PRAYER_REQUEST -> {
+                // optional
+            }
+
+            case BEREAVEMENT, GENERAL -> {
+                // no extra validation
+            }
+
+            default -> throw new IllegalArgumentException("Invalid message type");
         }
 
-        ContactMessage savedMessage = contactMessageRepository.save(mapToEntity(request));
+        ContactMessage message = mapToEntity(request);
+        ContactMessage savedMessage = contactMessageRepository.save(message);
 
         if (request.getType() == VISITATION_REQUEST) {
+
+            log.info("Creating appointment for message ID: {}", savedMessage.getId());
 
             LocalDateTime start = request.getPreferredDateTime();
 

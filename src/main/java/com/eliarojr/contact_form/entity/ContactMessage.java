@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -41,6 +43,9 @@ public class ContactMessage {
     protected void onCreate(){
         createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL)
+    private List<Appointment> appointments = new ArrayList<>();
 
 
 }
