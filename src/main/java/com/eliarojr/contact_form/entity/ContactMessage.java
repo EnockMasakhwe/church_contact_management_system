@@ -2,6 +2,7 @@ package com.eliarojr.contact_form.entity;
 
 import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.entity.enums.MessageType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,6 +44,10 @@ public class ContactMessage {
     protected void onCreate(){
         createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Appointment> appointments;
 
 
 }

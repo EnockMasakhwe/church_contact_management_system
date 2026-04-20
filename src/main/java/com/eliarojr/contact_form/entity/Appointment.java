@@ -1,6 +1,7 @@
 package com.eliarojr.contact_form.entity;
 
 import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class Appointment {
     private AppointmentStatus status;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "message_id")
     private ContactMessage message;
 }

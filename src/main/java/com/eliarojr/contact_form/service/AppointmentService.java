@@ -3,6 +3,7 @@ package com.eliarojr.contact_form.service;
 import com.eliarojr.contact_form.dto.AppointmentResponse;
 import com.eliarojr.contact_form.entity.Appointment;
 import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
+import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import lombok.RequiredArgsConstructor;
@@ -57,13 +58,21 @@ public class AppointmentService {
                 .toList();
     }
 
-    // UPDATE STATUS
     public Appointment updateStatus(Long id, AppointmentStatus status) {
 
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
 
         appointment.setStatus(status);
+
+        //AUTO SYNC MESSAGE STATUS
+        if (appointment.getMessage() != null) {
+
+            switch (status) {
+                case APPROVED -> appointment.getMessage().setStatus(MessageStatus.RESPONDED);
+                case REJECTED, COMPLETED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
+            }
+        }
 
         return appointmentRepository.save(appointment);
     }
