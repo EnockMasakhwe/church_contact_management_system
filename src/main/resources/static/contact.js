@@ -5,10 +5,7 @@ if (!token) {
     window.location.href = "login.html";
 }
 
-/* ======================
-   FORM LOGIC
-====================== */
-
+//FORM LOGIC
 function handleTypeChange() {
     const type = document.getElementById("type").value;
 
@@ -72,8 +69,12 @@ function submitForm(event) {
         },
         body: JSON.stringify(user)
     })
-        .then(res => {
-            if (!res.ok) throw new Error();
+        .then(async res => {
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.error("Backend error:", errorText);
+                throw new Error(errorText);
+            }
             return res.json();
         })
         .then(() => {
@@ -83,10 +84,7 @@ function submitForm(event) {
         .catch(() => alert("Something went wrong"));
 }
 
-/* ======================
-   CALENDAR LOGIC
-====================== */
-
+//CALENDAR LOGIC
 async function loadCalendar() {
     const res = await fetch("http://localhost:8080/api/appointments/public");
     const appointments = await res.json();
@@ -147,6 +145,17 @@ function renderCalendar(appointments) {
 
 let selectedSlot = null;
 
+//Convert to LOCAL datetime (NO UTC SHIFT)
+function formatLocalDateTime(date) {
+    const pad = (n) => n.toString().padStart(2, '0');
+
+    return date.getFullYear() + '-' +
+        pad(date.getMonth() + 1) + '-' +
+        pad(date.getDate()) + 'T' +
+        pad(date.getHours()) + ':' +
+        pad(date.getMinutes()) + ':' + '00';
+}
+
 function selectSlot(dateTime, element) {
     if (selectedSlot) {
         selectedSlot.classList.remove("selected");
@@ -155,17 +164,14 @@ function selectSlot(dateTime, element) {
     element.classList.add("selected");
     selectedSlot = element;
 
-    // Fix format for backend
-    const formatted = dateTime.toISOString().slice(0,16);
+    //send LOCAL time (no timezone conversion)
+    const formatted = formatLocalDateTime(dateTime);
     document.getElementById("preferredDateTime").value = formatted;
 }
 
 document.addEventListener("DOMContentLoaded", loadCalendar);
 
-/* ======================
-   LOGOUT
-====================== */
-
+//LOGOUT
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("role");

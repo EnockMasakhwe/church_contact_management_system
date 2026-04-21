@@ -1,6 +1,7 @@
 package com.eliarojr.contact_form.dto;
 
 import com.eliarojr.contact_form.entity.enums.MessageType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -35,6 +36,7 @@ public class ContactMessageRequest {
     private String location;
 
     @Future(message = "Preferred time must be in the future")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime preferredDateTime;
 
 }
