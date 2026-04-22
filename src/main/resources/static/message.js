@@ -5,7 +5,7 @@ if (!token) {
     window.location.href = "login.html";
 }
 
-//FORM LOGIC
+// FORM LOGIC
 function handleTypeChange() {
     const type = document.getElementById("type").value;
 
@@ -46,14 +46,12 @@ function submitForm(event) {
             return;
         }
         if (!preferredDateTime) {
-            alert("Please select a time from calendar");
+            alert("Please select a time");
             return;
         }
     }
 
-    const user = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
+    const payload = {
         phone: document.getElementById("phone").value,
         message: document.getElementById("message").value,
         type,
@@ -67,24 +65,34 @@ function submitForm(event) {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + token
         },
-        body: JSON.stringify(user)
+        body: JSON.stringify(payload)
     })
         .then(async res => {
+            const text = await res.text();
+
             if (!res.ok) {
-                const errorText = await res.text();
-                console.error("Backend error:", errorText);
-                throw new Error(errorText);
+                console.error("Backend error:", text);
+                alert(text || "Request failed");
+                return;
             }
-            return res.json();
-        })
-        .then(() => {
+
             document.getElementById("successMessage").innerText = "Message sent successfully!";
             document.getElementById("contactForm").reset();
+
+            if (selectedSlot) {
+                selectedSlot.classList.remove("selected");
+                selectedSlot = null;
+            }
+
+            loadCalendar();
         })
-        .catch(() => alert("Something went wrong"));
+        .catch(err => {
+            console.error(err);
+            alert("Something went wrong");
+        });
 }
 
-//CALENDAR LOGIC
+// CALENDAR LOGIC
 async function loadCalendar() {
     const res = await fetch("http://localhost:8080/api/appointments/public");
     const appointments = await res.json();
@@ -145,7 +153,6 @@ function renderCalendar(appointments) {
 
 let selectedSlot = null;
 
-//Convert to LOCAL datetime (NO UTC SHIFT)
 function formatLocalDateTime(date) {
     const pad = (n) => n.toString().padStart(2, '0');
 
@@ -164,14 +171,13 @@ function selectSlot(dateTime, element) {
     element.classList.add("selected");
     selectedSlot = element;
 
-    //send LOCAL time (no timezone conversion)
     const formatted = formatLocalDateTime(dateTime);
     document.getElementById("preferredDateTime").value = formatted;
 }
 
 document.addEventListener("DOMContentLoaded", loadCalendar);
 
-//LOGOUT
+// LOGOUT
 function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("role");

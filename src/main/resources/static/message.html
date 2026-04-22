@@ -3,7 +3,7 @@
 <head>
     <title>Contact Elders</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="contact.css">
+    <link rel="stylesheet" href="message.css">
 </head>
 <body>
 
@@ -17,8 +17,6 @@
 
         <form id="contactForm" onsubmit="submitForm(event)">
 
-            <input type="text" id="name" placeholder="Name" required>
-            <input type="email" id="email" placeholder="Email" required>
             <input type="text" id="phone" placeholder="Phone Number" required>
 
             <select id="type" required onchange="handleTypeChange()">
@@ -31,7 +29,6 @@
 
             <input type="text" id="location" placeholder="Location (for visitation)" style="display:none;">
 
-            <!-- Hidden datetime -->
             <input type="hidden" id="preferredDateTime">
 
             <textarea id="message" placeholder="Your message" required></textarea>
@@ -50,6 +47,6 @@
 
 </div>
 
-<script src="contact.js"></script>
+<script src="message.js"></script>
 </body>
 </html>

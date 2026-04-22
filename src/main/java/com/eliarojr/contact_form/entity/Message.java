@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,13 +16,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "contact_messages")
-public class ContactMessage {
+public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String email;
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -48,6 +45,10 @@ public class ContactMessage {
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Appointment> appointments;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
 
 }

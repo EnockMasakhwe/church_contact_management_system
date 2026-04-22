@@ -17,7 +17,7 @@ public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
 
-    // Admin calendar view (FULL DETAILS)
+    //Admin view
     public List<AppointmentResponse> getAllAppointments() {
 
         return appointmentRepository.findAllByOrderByStartTimeAsc()
@@ -28,15 +28,15 @@ public class AppointmentService {
                         a.getEndTime(),
                         a.getStatus().name(),
 
-                        a.getMessage() != null ? a.getMessage().getName() : "Unknown",
-                        a.getMessage() != null ? a.getMessage().getEmail() : "N/A",
-                        a.getMessage() != null ? a.getMessage().getMessage() : "-"
+                        //include user info
+                        a.getMessage().getUser().getUsername(),
+                        a.getMessage().getUser().getEmail(),
+                        a.getMessage().getMessage()
                 ))
                 .toList();
     }
 
-
-    // Public calendar view
+    //Public view
     public List<AppointmentResponse> getPublicAppointments() {
 
         return appointmentRepository.findAllByOrderByStartTimeAsc()
@@ -50,14 +50,14 @@ public class AppointmentService {
                         a.getStartTime(),
                         a.getEndTime(),
                         a.getStatus().name(),
-
-                        null, // 🔒 hide sensitive data
+                        null,
                         null,
                         null
                 ))
                 .toList();
     }
 
+    //Update status
     public Appointment updateStatus(Long id, AppointmentStatus status) {
 
         Appointment appointment = appointmentRepository.findById(id)
@@ -65,12 +65,13 @@ public class AppointmentService {
 
         appointment.setStatus(status);
 
-        //AUTO SYNC MESSAGE STATUS
+        //Auto-sync message
         if (appointment.getMessage() != null) {
 
             switch (status) {
-                case APPROVED -> appointment.getMessage().setStatus(MessageStatus.RESPONDED);
-                case REJECTED, COMPLETED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
+                case APPROVED -> appointment.getMessage().setStatus(MessageStatus.IN_PROGRESS);
+                case COMPLETED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
+                case REJECTED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
             }
         }
 

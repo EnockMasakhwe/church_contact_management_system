@@ -1,0 +1,28 @@
+package com.eliarojr.contact_form.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+public class MessageResponse {
+
+    private Long id;
+
+    private String message;
+    private String type;
+    private String status;
+
+    private String location;
+    private LocalDateTime preferredDateTime;
+
+    private String phone;
+
+    //from logged-in user
+    private String username;
+    private String userEmail;
+
+    private LocalDateTime createdAt;
+}

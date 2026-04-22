@@ -29,5 +29,5 @@ public class Appointment {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "message_id")
-    private ContactMessage message;
+    private Message message;
 }

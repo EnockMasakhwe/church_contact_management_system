@@ -5,7 +5,7 @@ if (token) {
     if (role === "ROLE_ADMIN") {
         window.location.href = "admin.html";
     } else {
-        window.location.href = "contact.html";
+        window.location.href = "message.html";
     }
 }
 
@@ -41,7 +41,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
         if (result.role === "ROLE_ADMIN") {
             window.location.href = "admin.html";
         } else {
-            window.location.href = "contact.html";
+            window.location.href = "message.html";
         }
 
     } catch (error) {

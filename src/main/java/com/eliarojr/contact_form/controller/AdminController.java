@@ -1,11 +1,10 @@
 package com.eliarojr.contact_form.controller;
 
 import com.eliarojr.contact_form.dto.UpdateStatusRequest;
-import com.eliarojr.contact_form.entity.ContactMessage;
+import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.service.AdminService;
-import com.eliarojr.contact_form.service.ContactMessageService;
+import com.eliarojr.contact_form.service.MessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +15,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final ContactMessageService contactMessageService;
+    private final MessageService messageService;
     private final AdminService adminService;
 
     @GetMapping("/messages")
-    public ResponseEntity<List<ContactMessage>> getAllMessages(){
+    public ResponseEntity<List<Message>> getAllMessages(){
         return ResponseEntity.ok(adminService.getAllMessages());
     }
 
@@ -38,7 +37,7 @@ public class AdminController {
     }
 
     @PutMapping("/messages/{id}/status")
-    public ResponseEntity<ContactMessage> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+    public ResponseEntity<Message> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
         return ResponseEntity.ok(adminService.updateStatus(id, request.getStatus()));
     }
 
