@@ -48,7 +48,7 @@ public class MessageServiceImpl implements MessageService {
                 .getUsername();
 
         User user = userRepository.findByEmail(email);
-               // .orElseThrow(() -> new RuntimeException("User not found"));
+                //.orElseThrow(() -> new RuntimeException("User not found"));
 
         MessageType type = MessageType.valueOf(String.valueOf(request.getType()));
 

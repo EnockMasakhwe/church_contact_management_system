@@ -22,9 +22,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public List<MessageResponse> getAllMessages() {
-        log.info("Fetching all messages from DB");
+        log.info("Fetching all messages from DB WITH USER");
 
-        return messageRepository.findAll()
+        return messageRepository.findAllWithUser()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -63,9 +63,17 @@ public class AdminServiceImpl implements AdminService {
         log.info("Deleting message ID: {}", id);
         messageRepository.deleteById(id);
     }
-
-    //MAPPER
+    
     private MessageResponse mapToResponse(Message message) {
+
+        String username = "-";
+        String email = "-";
+
+        if (message.getUser() != null) {
+            username = message.getUser().getUsername();
+            email = message.getUser().getEmail();
+        }
+
         return new MessageResponse(
                 message.getId(),
                 message.getMessage(),
@@ -74,8 +82,8 @@ public class AdminServiceImpl implements AdminService {
                 message.getLocation(),
                 message.getPreferredDateTime(),
                 message.getPhone(),
-                message.getUser() != null ? message.getUser().getUsername() : "-",
-                message.getUser() != null ? message.getUser().getEmail() : "-",
+                username,
+                email,
                 message.getCreatedAt()
         );
     }

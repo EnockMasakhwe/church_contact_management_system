@@ -23,8 +23,8 @@ public class MessageResponse {
     private String phone;
 
     //from logged-in user
-    private String username;
-    private String userEmail;
+    private String name;
+    private String email;
 
     private LocalDateTime createdAt;
 }
