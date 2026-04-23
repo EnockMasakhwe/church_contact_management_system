@@ -1,16 +1,17 @@
 package com.eliarojr.contact_form.service;
 
+import com.eliarojr.contact_form.dto.MessageResponse;
 import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.entity.enums.MessageStatus;
 
 import java.util.List;
 
 public interface AdminService {
-    List<Message> getAllMessages();
+    List<MessageResponse> getAllMessages();
 
-    Message getMessageById(Long id);
+    MessageResponse getMessageById(Long id);
 
-    Message updateStatus(Long id, MessageStatus status);
+    MessageResponse updateStatus(Long id, MessageStatus status);
 
     void deleteMessage(Long id);
 }

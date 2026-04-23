@@ -1,5 +1,6 @@
 package com.eliarojr.contact_form.controller;
 
+import com.eliarojr.contact_form.dto.MessageResponse;
 import com.eliarojr.contact_form.dto.UpdateStatusRequest;
 import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.service.AdminService;
@@ -19,7 +20,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/messages")
-    public ResponseEntity<List<Message>> getAllMessages(){
+    public ResponseEntity<List<MessageResponse>> getAllMessages(){
         return ResponseEntity.ok(adminService.getAllMessages());
     }
 
@@ -37,7 +38,7 @@ public class AdminController {
     }
 
     @PutMapping("/messages/{id}/status")
-    public ResponseEntity<Message> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+    public ResponseEntity<MessageResponse> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
         return ResponseEntity.ok(adminService.updateStatus(id, request.getStatus()));
     }
 
