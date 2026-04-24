@@ -11,4 +11,5 @@ import java.util.List;
 public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m JOIN FETCH m.user")
     List<Message> findAllWithUser();
+    List<Message> findByUser_IdOrderByCreatedAtDesc(Long userId);
 }

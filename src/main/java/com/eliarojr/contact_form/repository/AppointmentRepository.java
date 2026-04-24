@@ -24,4 +24,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // for calendar display
     List<Appointment> findAllByOrderByStartTimeAsc();
+
+    //For user messages view
+    List<Appointment> findByMessage_User_IdOrderByStartTimeAsc(Long userId);
 }

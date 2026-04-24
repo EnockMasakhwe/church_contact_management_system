@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<button onclick="logout()" class="logout-btn">Logout</button>
+
+<div class="container">
+
+    <h2>My Messages</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody id="myMessagesTable"></tbody>
+    </table>
+
+    <h2>My Appointments</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Message</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody id="myAppointmentsTable"></tbody>
+    </table>
+
+</div>
+
+<script src="user.js"></script>
+</body>
+</html>
