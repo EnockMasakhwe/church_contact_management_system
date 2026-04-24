@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loadAppointments();
 });
 
-//LOAD
+// LOAD MESSAGES
 function loadMessages() {
     fetch("http://localhost:8080/api/admin/messages", {
         headers: { "Authorization": "Bearer " + token }
@@ -25,7 +25,7 @@ function loadMessages() {
         });
 }
 
-//DISPLAY
+// DISPLAY MESSAGES
 function displayMessages(messages) {
     const table = document.getElementById("messageTable");
     table.innerHTML = "";
@@ -40,7 +40,11 @@ function displayMessages(messages) {
                 <td>${msg.message}</td>
                 <td>${msg.location || "-"}</td>
                 <td>${formatDate(msg.preferredDateTime)}</td>
-                <td>${msg.status}</td>
+                <td>
+                    <span class="status ${msg.status}">
+                        ${msg.status}
+                    </span>
+                </td>
                 <td>${buildActions(msg)}</td>
             </tr>
         `;
@@ -48,29 +52,50 @@ function displayMessages(messages) {
     });
 }
 
-//ACTIONS
+// FILTER MESSAGES (NEW)
+function filterMessages() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const status = document.getElementById("statusFilter").value;
+    const type = document.getElementById("typeFilter").value;
+
+    const filtered = allMessages.filter(msg => {
+        const matchesSearch =
+            msg.message?.toLowerCase().includes(search) ||
+            msg.name?.toLowerCase().includes(search) ||
+            msg.email?.toLowerCase().includes(search);
+
+        const matchesStatus = status ? msg.status === status : true;
+        const matchesType = type ? msg.type === type : true;
+
+        return matchesSearch && matchesStatus && matchesType;
+    });
+
+    displayMessages(filtered);
+}
+
+// ACTION BUTTONS (Styled)
 function buildActions(msg) {
     let buttons = "";
 
     if (msg.status === "NEW") {
-        buttons += `<button onclick="updateStatus(${msg.id}, 'READ')">Read</button>`;
+        buttons += `<button class="action-btn read-btn" onclick="updateStatus(${msg.id}, 'READ')">Read</button>`;
     }
     if (msg.status === "READ") {
-        buttons += `<button onclick="updateStatus(${msg.id}, 'IN_PROGRESS')">Start</button>`;
+        buttons += `<button class="action-btn progress-btn" onclick="updateStatus(${msg.id}, 'IN_PROGRESS')">Start</button>`;
     }
     if (msg.status === "IN_PROGRESS") {
-        buttons += `<button onclick="updateStatus(${msg.id}, 'RESPONDED')">Responded</button>`;
+        buttons += `<button class="action-btn respond-btn" onclick="updateStatus(${msg.id}, 'RESPONDED')">Respond</button>`;
     }
     if (msg.status === "RESPONDED") {
-        buttons += `<button onclick="updateStatus(${msg.id}, 'CLOSED')">Close</button>`;
+        buttons += `<button class="action-btn close-btn" onclick="updateStatus(${msg.id}, 'CLOSED')">Close</button>`;
     }
 
-    buttons += `<button onclick="deleteMessage(${msg.id})">Delete</button>`;
+    buttons += `<button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">Delete</button>`;
 
     return buttons;
 }
 
-//UPDATE
+// UPDATE STATUS
 function updateStatus(id, status) {
     fetch(`http://localhost:8080/api/admin/messages/${id}/status`, {
         method: "PUT",
@@ -82,7 +107,7 @@ function updateStatus(id, status) {
     }).then(() => loadMessages());
 }
 
-//DELETE
+// DELETE
 function deleteMessage(id) {
     fetch(`http://localhost:8080/api/admin/messages/${id}`, {
         method: "DELETE",
@@ -90,7 +115,7 @@ function deleteMessage(id) {
     }).then(() => loadMessages());
 }
 
-//APPOINTMENTS
+// APPOINTMENTS
 function loadAppointments() {
     fetch("http://localhost:8080/api/admin/appointments", {
         headers: { "Authorization": "Bearer " + token }
@@ -112,7 +137,11 @@ function displayAppointments(appointments) {
                 <td>${app.message || "-"}</td>
                 <td>${formatDate(app.startTime)}</td>
                 <td>${formatDate(app.endTime)}</td>
-                <td>${app.status}</td>
+                <td>
+                    <span class="status ${app.status}">
+                        ${app.status}
+                    </span>
+                </td>
                 <td>${buildAppointmentActions(app)}</td>
             </tr>
         `;
@@ -120,16 +149,17 @@ function displayAppointments(appointments) {
     });
 }
 
+// APPOINTMENT ACTIONS (Styled)
 function buildAppointmentActions(app) {
     let buttons = "";
 
     if (app.status === "PENDING") {
-        buttons += `<button onclick="updateAppointmentStatus(${app.id}, 'APPROVED')">Approve</button>`;
-        buttons += `<button onclick="updateAppointmentStatus(${app.id}, 'REJECTED')">Reject</button>`;
+        buttons += `<button class="action-btn read-btn" onclick="updateAppointmentStatus(${app.id}, 'APPROVED')">Approve</button>`;
+        buttons += `<button class="action-btn delete-btn" onclick="updateAppointmentStatus(${app.id}, 'REJECTED')">Reject</button>`;
     }
 
     if (app.status === "APPROVED") {
-        buttons += `<button onclick="updateAppointmentStatus(${app.id}, 'COMPLETED')">Complete</button>`;
+        buttons += `<button class="action-btn progress-btn" onclick="updateAppointmentStatus(${app.id}, 'COMPLETED')">Complete</button>`;
     }
 
     return buttons;
@@ -142,9 +172,17 @@ function updateAppointmentStatus(id, status) {
     }).then(() => loadAppointments());
 }
 
-//UTIL
+// UTIL
 function formatDate(date) {
     return date ? new Date(date).toLocaleString() : "-";
+}
+
+function goToDashboard() {
+    window.location.href = "user.html";
+}
+
+function goToMessages() {
+    window.location.href = "message.html";
 }
 
 function logout() {

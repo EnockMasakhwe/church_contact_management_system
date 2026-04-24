@@ -7,12 +7,20 @@
 </head>
 <body>
 
-<button onclick="logout()" class="logout-btn">Logout</button>
+<!--SHARED HEADER -->
+<div class="header">
+    <h2>Admin Dashboard</h2>
+    <div class="header-actions">
+        <button class="nav-btn" onclick="goToMessages()">Messages</button>
+        <button class="nav-btn" onclick="goToDashboard()">User Dashboard</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
 
 <div class="container">
 
     <div class="dashboard-header">
-        <h2>Admin Dashboard</h2>
+        <h3>Messages</h3>
     </div>
 
     <div class="controls">

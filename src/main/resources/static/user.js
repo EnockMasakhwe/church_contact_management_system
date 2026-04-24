@@ -30,7 +30,7 @@ function displayMyMessages(messages) {
                 <td>${msg.id}</td>
                 <td>${msg.type}</td>
                 <td>${msg.message}</td>
-                <td>${msg.status}</td>
+                <td><span class="status ${msg.status}">${msg.status}</span></td>
                 <td>${formatDate(msg.createdAt)}</td>
             </tr>
         `;
@@ -58,7 +58,7 @@ function displayMyAppointments(apps) {
                 <td>${app.message || "-"}</td>
                 <td>${formatDate(app.startTime)}</td>
                 <td>${formatDate(app.endTime)}</td>
-                <td>${app.status}</td>
+                <td><span class="status ${app.status}">${app.status}</span></td>
             </tr>
         `;
     });
@@ -76,6 +76,10 @@ function handleAuth(res) {
         throw new Error("Unauthorized");
     }
     return res;
+}
+
+function goToMessages() {
+    window.location.href = "message.html";
 }
 
 function logout() {

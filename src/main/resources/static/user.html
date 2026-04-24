@@ -4,10 +4,20 @@
     <title>User Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<button onclick="logout()" class="logout-btn">Logout</button>
+<!-- HEADER -->
+<div class="header">
+    <h2>My Dashboard</h2>
+    <div class="header-actions">
+        <button class="nav-btn" onclick="goToMessages()">New Message</button>
+        <button class="nav-btn" onclick="goToDashboard()">Dashboard</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
 
+<!-- CONTENT -->
 <div class="container">
 
     <h2>My Messages</h2>

@@ -1,28 +1,76 @@
+/*GLOBAL RESET + BODY*/
+* {
+    box-sizing: border-box;
+}
+
 body {
+    margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #4facfe, #00f2fe);
-    margin: 0;
-    padding: 0;
     min-height: 100vh;
 }
 
-/* Centered Card */
-.container {
-    width: 360px;
-    margin: 80px auto;
+/* HEADER (GLOBAL NAV)*/
+.header {
+    width: 100%;
     background: #fff;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    text-align: center;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-/* Headings */
-h2 {
-    margin-bottom: 20px;
+.header h2 {
+    margin: 0;
+    color: #333;
 }
 
-/* Inputs */
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/*BUTTONS (GLOBAL)*/
+button {
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+/* Primary (forms) */
+.primary-btn {
+    width: 100%;
+    padding: 11px;
+    background: #4facfe;
+    color: white;
+}
+
+.primary-btn:hover {
+    background: #007bff;
+}
+
+/* Navigation buttons */
+.nav-btn {
+    padding: 8px 14px;
+    background: #5b86e5;
+    color: white;
+}
+
+.nav-btn:hover {
+    background: #3f6ad8;
+}
+
+/* Logout */
+.logout-btn {
+    padding: 8px 14px;
+    background: red;
+    color: white;
+}
+
+/*FORM ELEMENTS*/
 input, select, textarea {
     width: 100%;
     padding: 11px;
@@ -38,25 +86,95 @@ input:focus, textarea:focus, select:focus {
     box-shadow: 0 0 5px rgba(79,172,254,0.5);
 }
 
-/* Buttons */
-button {
+/*AUTH / SMALL CARD*/
+.auth-container {
+    width: 360px;
+    margin: 80px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+/*MAIN LAYOUT (MESSAGE PAGE)*/
+.main-layout {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 40px;
+    flex-wrap: wrap;
+}
+
+/* Form card */
+.form-container {
+    width: 350px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+/* Calendar */
+.calendar-container {
+    width: 650px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+/* DASHBOARD CONTAINER*/
+.container {
+    width: 85%;
+    margin: 40px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/*TABLES*/
+table {
     width: 100%;
-    padding: 11px;
-    margin-top: 10px;
-    border-radius: 8px;
-    border: none;
-    background: #4facfe;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+th {
+    background: #5b86e5;
     color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+    padding: 10px;
+    text-align: left;
 }
 
-button:hover {
-    background: #007bff;
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
 
-/* Links */
+tr:hover {
+    background: #f5f5f5;
+}
+
+/* STATUS BADGES*/
+.statusFilter {
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+}
+
+/* Message statuses */
+.NEW { background: gray; }
+.IN_PROGRESS { background: orange; }
+.RESPONDED { background: blue; }
+.CLOSED { background: green; }
+
+/* Appointment statuses */
+.PENDING { background: orange; }
+.APPROVED { background: green; }
+.REJECTED { background: red; }
+
+/*LINKS*/
 a {
     color: #007bff;
     text-decoration: none;
@@ -66,12 +184,38 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Logout */
-.logout-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: auto;
-    padding: 8px 15px;
-    background: red;
+/* Ensure auth pages stay centered */
+.auth-container {
+    width: 360px;
+    margin: 100px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.auth-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.auth-container button {
+    margin-top: 10px;
+}
+
+/*RESPONSIVE*/
+@media (max-width: 900px) {
+    .main-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .calendar-container {
+        width: 100%;
+    }
+
+    .container {
+        width: 95%;
+    }
 }

@@ -177,6 +177,10 @@ function selectSlot(dateTime, element) {
 
 document.addEventListener("DOMContentLoaded", loadCalendar);
 
+function goToDashboard() {
+    window.location.href = "user.html";
+}
+
 // LOGOUT
 function logout() {
     localStorage.removeItem("token");

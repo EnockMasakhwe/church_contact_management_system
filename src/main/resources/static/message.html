@@ -7,16 +7,24 @@
 </head>
 <body>
 
-<button onclick="logout()" class="logout-btn">Logout</button>
+<!-- HEADER -->
+<div class="header">
+    <h2>Contact Elders</h2>
+    <div class="header-actions">
+        <button class="nav-btn" onclick="goToMessages()">New Message</button>
+        <button class="nav-btn" onclick="goToDashboard()">Dashboard</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
 
+<!-- MAIN CONTENT -->
 <div class="main-layout">
 
     <!-- FORM -->
     <div class="form-container">
-        <h2>Contact Elders</h2>
+        <h3>Send a Message</h3>
 
         <form id="contactForm" onsubmit="submitForm(event)">
-
             <input type="text" id="phone" placeholder="Phone Number" required>
 
             <select id="type" required onchange="handleTypeChange()">
@@ -28,12 +36,11 @@
             </select>
 
             <input type="text" id="location" placeholder="Location (for visitation)" style="display:none;">
-
             <input type="hidden" id="preferredDateTime">
 
             <textarea id="message" placeholder="Your message" required></textarea>
 
-            <button type="submit">Send Message</button>
+            <button type="submit" class="primary-btn">Send Message</button>
         </form>
 
         <p id="successMessage"></p>
