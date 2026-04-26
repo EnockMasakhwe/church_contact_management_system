@@ -11,6 +11,7 @@ import com.eliarojr.contact_form.entity.enums.MessageType;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.MessageRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
+import com.eliarojr.contact_form.service.EmailService;
 import com.eliarojr.contact_form.service.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     private final Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
 
@@ -88,6 +90,26 @@ public class MessageServiceImpl implements MessageService {
         message.setPhone(request.getPhone());
 
         Message saved = messageRepository.save(message);
+
+        // Notify admin
+        String adminEmail = "enockmasakhwe@gmail.com";
+
+        String subject = "New Message Received";
+
+        String body = """
+             <h3>New Message Submitted</h3>
+             <p><strong>User:</strong> %s</p>
+             <p><strong>Email:</strong> %s</p>
+             <p><strong>Type:</strong> %s</p>
+             <p><strong>Message:</strong> %s</p>
+        """.formatted(
+                user.getUsername(),
+                user.getEmail(),
+                type.name(),
+                request.getMessage()
+        );
+
+        emailService.sendEmail(adminEmail, subject, body);
 
         //CREATE APPOINTMENT
         if (type == MessageType.VISITATION_REQUEST) {

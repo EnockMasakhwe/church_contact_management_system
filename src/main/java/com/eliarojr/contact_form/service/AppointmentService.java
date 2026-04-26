@@ -16,6 +16,7 @@ import java.util.List;
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
+    private final EmailService emailService;
 
     //Admin view
     public List<AppointmentResponse> getAllAppointments() {
@@ -67,7 +68,6 @@ public class AppointmentService {
 
         //Auto-sync message
         if (appointment.getMessage() != null) {
-
             switch (status) {
                 case APPROVED -> appointment.getMessage().setStatus(MessageStatus.IN_PROGRESS);
                 case COMPLETED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
@@ -75,6 +75,39 @@ public class AppointmentService {
             }
         }
 
-        return appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+
+        //Send email AFTER save
+        if (saved.getMessage() != null && saved.getMessage().getUser() != null) {
+
+            String userEmail = saved.getMessage().getUser().getEmail();
+            String username = saved.getMessage().getUser().getUsername();
+
+            String subject;
+            String body;
+
+            switch (status) {
+                case APPROVED -> {
+                    subject = "Appointment Approved";
+                    body = "<h3>Hello " + username + ",</h3><p>Your appointment has been approved.</p>";
+                }
+                case REJECTED -> {
+                    subject = "Appointment Rejected";
+                    body = "<h3>Hello " + username + ",</h3><p>Your appointment was rejected.</p>";
+                }
+                case COMPLETED -> {
+                    subject = "Appointment Completed";
+                    body = "<h3>Hello " + username + ",</h3><p>Your appointment is completed.</p>";
+                }
+                default -> {
+                    subject = "Appointment Update";
+                    body = "<p>Status updated</p>";
+                }
+            }
+
+            emailService.sendEmail(userEmail, subject, body);
+        }
+
+        return saved;
     }
 }
