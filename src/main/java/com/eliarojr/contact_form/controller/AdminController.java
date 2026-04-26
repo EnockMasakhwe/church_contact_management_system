@@ -1,9 +1,11 @@
 package com.eliarojr.contact_form.controller;
 
+import com.eliarojr.contact_form.dto.AdminStatsResponse;
 import com.eliarojr.contact_form.dto.MessageResponse;
 import com.eliarojr.contact_form.dto.UpdateStatusRequest;
 import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.service.AdminService;
+import com.eliarojr.contact_form.service.AdminStatsService;
 import com.eliarojr.contact_form.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ public class AdminController {
 
     private final MessageService messageService;
     private final AdminService adminService;
+    private final AdminStatsService adminStatsService;
 
     @GetMapping("/messages")
     public ResponseEntity<List<MessageResponse>> getAllMessages(){
@@ -40,6 +43,11 @@ public class AdminController {
     @PutMapping("/messages/{id}/status")
     public ResponseEntity<MessageResponse> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
         return ResponseEntity.ok(adminService.updateStatus(id, request.getStatus()));
+    }
+
+    @GetMapping("/stats")
+    public AdminStatsResponse getStats() {
+        return adminStatsService.getStats();
     }
 
 }

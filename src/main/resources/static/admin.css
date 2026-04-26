@@ -142,6 +142,34 @@ tbody tr:hover {
     color: #004085;
 }
 
+/*Admin analytics*/
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 {
+    margin: 0;
+    font-size: 22px;
+    color: #5b86e5;
+}
+
+.stat-card p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #666;
+}
+
 /*RESPONSIVE*/
 @media (max-width: 768px) {
     .controls {

@@ -189,3 +189,64 @@ function logout() {
     localStorage.clear();
     window.location.href = "login.html";
 }
+
+//Admin analytics
+function loadStats() {
+    fetch("http://localhost:8080/api/admin/stats", {
+        headers: { "Authorization": "Bearer " + token }
+    })
+        .then(res => res.json())
+        .then(data => displayStats(data));
+}
+
+function displayStats(stats) {
+    const container = document.getElementById("statsContainer");
+
+    container.innerHTML = `
+        <div class="stat-card">
+            <h3>${stats.totalMessages}</h3>
+            <p>Total Messages</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>${stats.newMessages}</h3>
+            <p>New</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>${stats.inProgressMessages}</h3>
+            <p>In Progress</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>${stats.closedMessages}</h3>
+            <p>Closed</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>${stats.totalAppointments}</h3>
+            <p>Appointments</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>${stats.pendingAppointments}</h3>
+            <p>Pending</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>${stats.approvedAppointments}</h3>
+            <p>Approved</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>${stats.completedAppointments}</h3>
+            <p>Completed</p>
+        </div>
+    `;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadStats();
+    loadMessages();
+    loadAppointments();
+});
