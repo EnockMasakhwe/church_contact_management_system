@@ -1,49 +1,24 @@
-/* ADMIN CONTAINER OVERRIDE
-   (extends global .container)*/
-.container {
-    max-width: 1200px;
-    margin: 40px auto;
-    border-radius: 14px;
-}
-
-/* DASHBOARD HEADER*/
+/* HEADER SPACE */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
-/*CONTROLS (SEARCH + FILTERS)*/
+/* CONTROLS */
 .controls {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
     flex-wrap: wrap;
+    margin-bottom: 20px;
 }
 
 .controls input,
 .controls select {
-    width: auto;
     min-width: 180px;
 }
 
-/*TABLE TWEAKS (extend global)*/
-table {
-    margin-top: 10px;
-}
-
-th, td {
-    text-align: center;
-    padding: 12px;
-}
-
-/* Slight admin hover improvement */
-tbody tr:hover {
-    background: #f5f9ff;
-}
-
-/*ACTION BUTTONS*/
+/* ACTION BUTTONS */
 .action-btn {
     padding: 6px 10px;
     margin: 2px;
@@ -51,139 +26,14 @@ tbody tr:hover {
     font-size: 12px;
     border: none;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-/* Specific actions */
-.read-btn {
-    background: #28a745;
-    color: white;
-}
+.read-btn { background: #28a745; color: white; }
+.progress-btn { background: #ffc107; }
+.respond-btn { background: #17a2b8; color: white; }
+.close-btn { background: #6c757d; color: white; }
+.delete-btn { background: #dc3545; color: white; }
 
-.progress-btn {
-    background: #ffc107;
-    color: black;
-}
-
-.respond-btn {
-    background: #17a2b8;
-    color: white;
-}
-
-.close-btn {
-    background: #6c757d;
-    color: white;
-}
-
-.delete-btn {
-    background: #dc3545;
-    color: white;
-}
-
-/* Hover effects */
 .action-btn:hover {
     opacity: 0.85;
-}
-
-/*STATUS BADGES (ENHANCED)
-   (builds on global .status)*/
-.statusFilter {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    display: inline-block;
-}
-
-/* Message statuses */
-.statusFilter.NEW {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.statusFilter.READ {
-    background: #d4edda;
-    color: #155724;
-}
-
-.statusFilter.IN_PROGRESS {
-    background: #ffeeba;
-    color: #856404;
-}
-
-.statusFilter.RESPONDED {
-    background: #cce5ff;
-    color: #004085;
-}
-
-.statusFilter.CLOSED {
-    background: #e2e3e5;
-    color: #383d41;
-}
-
-/* Appointment statuses */
-.statusFilter.PENDING {
-    background: #ffeeba;
-    color: #856404;
-}
-
-.statusFilter.APPROVED {
-    background: #d4edda;
-    color: #155724;
-}
-
-.statusFilter.REJECTED {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-.statusFilter.COMPLETED {
-    background: #cce5ff;
-    color: #004085;
-}
-
-/*Admin analytics*/
-.stats-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.stat-card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.stat-card h3 {
-    margin: 0;
-    font-size: 22px;
-    color: #5b86e5;
-}
-
-.stat-card p {
-    margin: 5px 0 0;
-    font-size: 13px;
-    color: #666;
-}
-
-/*RESPONSIVE*/
-@media (max-width: 768px) {
-    .controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .controls input,
-    .controls select {
-        width: 100%;
-    }
-
-    th, td {
-        font-size: 12px;
-        padding: 8px;
-    }
 }

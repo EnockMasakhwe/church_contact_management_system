@@ -182,16 +182,18 @@ tr:hover {
     font-size: 12px;
 }
 
-/* Message statuses */
-.NEW { background: #6c757d; }
-.IN_PROGRESS { background: #f39c12; }
-.RESPONDED { background: #3498db; }
-.CLOSED { background: #2ecc71; }
+/* MESSAGE STATUS */
+.NEW { background: #fff3cd; color: #856404; }
+.READ { background: #d4edda; color: #155724; }
+.IN_PROGRESS { background: #ffeeba; color: #856404; }
+.RESPONDED { background: #cce5ff; color: #004085; }
+.CLOSED { background: #e2e3e5; color: #383d41; }
 
-/* Appointment statuses */
-.PENDING { background: #f39c12; }
-.APPROVED { background: #2ecc71; }
-.REJECTED { background: #e74c3c; }
+/* APPOINTMENTS */
+.PENDING { background: #ffeeba; color: #856404; }
+.APPROVED { background: #d4edda; color: #155724; }
+.REJECTED { background: #f8d7da; color: #721c24; }
+.COMPLETED { background: #cce5ff; color: #004085; }
 
 /* LINKS */
 a {
