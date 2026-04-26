@@ -1,29 +1,30 @@
-/*GLOBAL RESET + BODY*/
+/* GLOBAL RESET */
 * {
     box-sizing: border-box;
 }
 
+/* BODY */
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    background: #eef3f8;
     min-height: 100vh;
 }
 
-/* HEADER (GLOBAL NAV)*/
+/* HEADER */
 .header {
     width: 100%;
-    background: #fff;
-    padding: 15px 40px;
+    background: #2d7dd2;
+    color: white;
+    padding: 12px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .header h2 {
     margin: 0;
-    color: #333;
+    font-size: 18px;
 }
 
 .header-actions {
@@ -31,7 +32,7 @@ body {
     gap: 10px;
 }
 
-/*BUTTONS (GLOBAL)*/
+/* BUTTONS */
 button {
     border: none;
     border-radius: 6px;
@@ -40,99 +41,117 @@ button {
     font-weight: 500;
 }
 
-/* Primary (forms) */
+/* Primary button */
 .primary-btn {
     width: 100%;
-    padding: 11px;
-    background: #4facfe;
+    padding: 10px;
+    background: #2d7dd2;
     color: white;
 }
 
 .primary-btn:hover {
-    background: #007bff;
+    background: #1b5fa7;
 }
 
-/* Navigation buttons */
+/* Nav buttons */
 .nav-btn {
     padding: 8px 14px;
-    background: #5b86e5;
+    background: rgba(255,255,255,0.15);
     color: white;
 }
 
 .nav-btn:hover {
-    background: #3f6ad8;
+    background: rgba(255,255,255,0.3);
 }
 
 /* Logout */
 .logout-btn {
     padding: 8px 14px;
-    background: red;
+    background: #e74c3c;
     color: white;
 }
 
-/*FORM ELEMENTS*/
+/* FORM ELEMENTS */
 input, select, textarea {
     width: 100%;
-    padding: 11px;
-    margin: 10px 0;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    outline: none;
-    transition: 0.3s;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #dcdfe6;
+    background: #f9fbfd;
 }
 
 input:focus, textarea:focus, select:focus {
-    border-color: #4facfe;
-    box-shadow: 0 0 5px rgba(79,172,254,0.5);
+    border-color: #2d7dd2;
+    background: white;
+    box-shadow: none;
 }
 
-/*AUTH / SMALL CARD*/
+/* AUTH CARD */
 .auth-container {
     width: 360px;
-    margin: 80px auto;
+    margin: 100px auto;
     background: #fff;
     padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    border: 1px solid #e0e6ed;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     text-align: center;
 }
 
-/*MAIN LAYOUT (MESSAGE PAGE)*/
+.auth-container h2 {
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* MAIN LAYOUT */
 .main-layout {
     display: flex;
     justify-content: center;
-    gap: 40px;
-    padding: 40px;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 30px;
     flex-wrap: wrap;
 }
 
-/* Form card */
+/* FORM CARD */
 .form-container {
-    width: 350px;
+    width: 380px;
     background: #fff;
     padding: 25px;
-    border-radius: 12px;
+    border-radius: 10px;
+    border: 1px solid #e0e6ed;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/* Calendar */
+.form-container h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+/* CALENDAR */
 .calendar-container {
     width: 650px;
     background: #fff;
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 10px;
+    border: 1px solid #e0e6ed;
 }
 
-/* DASHBOARD CONTAINER*/
+/* DASHBOARD CONTAINER */
 .container {
     width: 85%;
     margin: 40px auto;
     background: #fff;
     padding: 25px;
     border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e0e6ed;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/*TABLES*/
+/* TABLES */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -140,7 +159,7 @@ table {
 }
 
 th {
-    background: #5b86e5;
+    background: #2d7dd2;
     color: white;
     padding: 10px;
     text-align: left;
@@ -148,14 +167,14 @@ th {
 
 td {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #eee;
 }
 
 tr:hover {
-    background: #f5f5f5;
+    background: #f5f9ff;
 }
 
-/* STATUS BADGES*/
+/* STATUS BADGES */
 .statusFilter {
     padding: 5px 10px;
     border-radius: 5px;
@@ -164,19 +183,19 @@ tr:hover {
 }
 
 /* Message statuses */
-.NEW { background: gray; }
-.IN_PROGRESS { background: orange; }
-.RESPONDED { background: blue; }
-.CLOSED { background: green; }
+.NEW { background: #6c757d; }
+.IN_PROGRESS { background: #f39c12; }
+.RESPONDED { background: #3498db; }
+.CLOSED { background: #2ecc71; }
 
 /* Appointment statuses */
-.PENDING { background: orange; }
-.APPROVED { background: green; }
-.REJECTED { background: red; }
+.PENDING { background: #f39c12; }
+.APPROVED { background: #2ecc71; }
+.REJECTED { background: #e74c3c; }
 
-/*LINKS*/
+/* LINKS */
 a {
-    color: #007bff;
+    color: #2d7dd2;
     text-decoration: none;
 }
 
@@ -184,27 +203,12 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Ensure auth pages stay centered */
-.auth-container {
-    width: 360px;
-    margin: 100px auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    text-align: center;
+/* FORM SPACING */
+form > * {
+    margin-bottom: 10px;
 }
 
-.auth-container h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.auth-container button {
-    margin-top: 10px;
-}
-
-/*RESPONSIVE*/
+/* RESPONSIVE */
 @media (max-width: 900px) {
     .main-layout {
         flex-direction: column;

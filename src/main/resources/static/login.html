@@ -11,7 +11,6 @@
 
     <h2>Welcome Back</h2>
 
-    <!-- LOGIN FORM -->
     <form id="loginForm">
         <input type="email" id="email" placeholder="Email" required>
         <input type="password" id="password" placeholder="Password" required>
@@ -21,12 +20,11 @@
 
     <p>No account? <a href="register.html">Register</a></p>
 
-    <!-- FORGOT PASSWORD -->
     <p>
         <a href="#" onclick="toggleForgotPassword()">Forgot Password?</a>
     </p>
 
-    <div id="forgotPasswordBox" style="display:none; margin-top:15px;">
+    <div id="forgotPasswordBox" style="display:none;">
         <input type="email" id="forgotEmail" placeholder="Enter your email">
         <button class="primary-btn" onclick="sendResetLink()">Send Reset Link</button>
         <p id="forgotMsg"></p>

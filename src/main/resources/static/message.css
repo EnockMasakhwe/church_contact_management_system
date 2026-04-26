@@ -2,17 +2,19 @@
 .main-layout {
     display: flex;
     justify-content: center;
-    gap: 40px;
-    padding: 40px;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 30px;
     flex-wrap: wrap;
 }
 
 /* Form */
 .form-container {
-    width: 350px;
+    width: 380px;
     background: #fff;
     padding: 25px;
-    border-radius: 12px;
+    border-radius: 10px;
+    border: 1px solid #e0e6ed;
 }
 
 /* Calendar */
@@ -20,7 +22,8 @@
     width: 650px;
     background: #fff;
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 10px;
+    border: 1px solid #e0e6ed;
 }
 
 /* Calendar grid */
@@ -32,17 +35,19 @@
 
 /* Day */
 .day-column {
-    border: 1px solid #ddd;
+    border: 1px solid #e0e6ed;
     padding: 8px;
-    border-radius: 8px;
+    border-radius: 6px;
+    background: #f9fbfd;
 }
 
 /* Header */
 .day-header {
-    font-weight: bold;
+    font-weight: 600;
     text-align: center;
     margin-bottom: 8px;
     font-size: 12px;
+    color: #2c3e50;
 }
 
 /* Slots */
@@ -52,7 +57,7 @@
     text-align: center;
     border-radius: 5px;
     cursor: pointer;
-    background: #ecf0f1;
+    background: #eef3f8;
     font-size: 12px;
 }
 
@@ -65,11 +70,11 @@
 
 /* Selected */
 .time-slot.selected {
-    background: #2ecc71;
+    background: #2d7dd2;
     color: white;
 }
 
-/* Past (disabled) */
+/* Past */
 .time-slot.past {
     background: #bdc3c7;
     cursor: not-allowed;
