@@ -1,7 +1,8 @@
-/* HEADER SPACE */
+/* DASHBOARD HEADER */
 .dashboard-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
 }
 
@@ -13,9 +14,24 @@
     margin-bottom: 20px;
 }
 
+/* override global full width inputs */
 .controls input,
 .controls select {
+    width: auto;
     min-width: 180px;
+}
+
+/* TABLE POLISH */
+table {
+    margin-top: 10px;
+}
+
+th {
+    text-align: left;
+}
+
+td {
+    text-align: left;
 }
 
 /* ACTION BUTTONS */
@@ -26,14 +42,57 @@
     font-size: 12px;
     border: none;
     cursor: pointer;
+    transition: 0.2s;
 }
 
+/* COLORS */
 .read-btn { background: #28a745; color: white; }
-.progress-btn { background: #ffc107; }
+.progress-btn { background: #ffc107; color: #333; }
 .respond-btn { background: #17a2b8; color: white; }
 .close-btn { background: #6c757d; color: white; }
 .delete-btn { background: #dc3545; color: white; }
 
+/* HOVER */
 .action-btn:hover {
     opacity: 0.85;
+}
+
+/* STATS (matches global look) */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: #f9fbfd;
+    border: 1px solid #e0e6ed;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin: 0;
+    color: #2d7dd2;
+    font-size: 20px;
+}
+
+.stat-card p {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+    }
+
+    .controls input,
+    .controls select {
+        width: 100%;
+    }
 }

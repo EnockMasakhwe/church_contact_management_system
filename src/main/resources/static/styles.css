@@ -210,6 +210,26 @@ form > * {
     margin-bottom: 10px;
 }
 
+/* UNIFIED STATUS BADGE */
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* ensure table alignment consistency */
+th, td {
+    vertical-align: middle;
+}
+
+/* dashboard section spacing */
+.dashboard-header h3 {
+    margin: 0;
+    color: #2c3e50;
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
     .main-layout {
