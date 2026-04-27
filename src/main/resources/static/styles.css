@@ -230,6 +230,13 @@ th, td {
     color: #2c3e50;
 }
 
+#pagination, #appointmentPagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
     .main-layout {

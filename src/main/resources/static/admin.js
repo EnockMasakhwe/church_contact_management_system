@@ -7,8 +7,14 @@ if (!token || (role !== "ROLE_ADMIN" && role !== "ROLE_SUPER_ADMIN")) {
 }
 
 let allMessages = [];
+let filteredMessages = [];
+
+// PAGINATION
+let currentPage = 1;
+const rowsPerPage = 8;
 
 document.addEventListener("DOMContentLoaded", () => {
+    loadStats();
     loadMessages();
     loadAppointments();
 });
@@ -21,16 +27,21 @@ function loadMessages() {
         .then(res => res.json())
         .then(data => {
             allMessages = data;
-            displayMessages(data);
+            filteredMessages = data;
+            currentPage = 1;
+            displayMessages();
         });
 }
 
-// DISPLAY MESSAGES
-function displayMessages(messages) {
+// DISPLAY MESSAGES (WITH PAGINATION)
+function displayMessages() {
     const table = document.getElementById("messageTable");
     table.innerHTML = "";
 
-    messages.forEach(msg => {
+    const start = (currentPage - 1) * rowsPerPage;
+    const paginated = filteredMessages.slice(start, start + rowsPerPage);
+
+    paginated.forEach(msg => {
         const row = `
             <tr>
                 <td>${msg.id}</td>
@@ -50,15 +61,17 @@ function displayMessages(messages) {
         `;
         table.innerHTML += row;
     });
+
+    renderPagination();
 }
 
-// FILTER MESSAGES (NEW)
+// FILTER MESSAGES
 function filterMessages() {
     const search = document.getElementById("searchInput").value.toLowerCase();
     const status = document.getElementById("statusFilter").value;
     const type = document.getElementById("typeFilter").value;
 
-    const filtered = allMessages.filter(msg => {
+    filteredMessages = allMessages.filter(msg => {
         const matchesSearch =
             msg.message?.toLowerCase().includes(search) ||
             msg.name?.toLowerCase().includes(search) ||
@@ -70,10 +83,32 @@ function filterMessages() {
         return matchesSearch && matchesStatus && matchesType;
     });
 
-    displayMessages(filtered);
+    currentPage = 1; // reset page
+    displayMessages();
 }
 
-// ACTION BUTTONS (Styled)
+// PAGINATION UI
+function renderPagination() {
+    const totalPages = Math.ceil(filteredMessages.length / rowsPerPage);
+    const container = document.getElementById("pagination");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    for (let i = 1; i <= totalPages; i++) {
+        container.innerHTML += `
+            <button class="page-btn ${i === currentPage ? "active-page" : ""}"
+                onclick="goToPage(${i})">${i}</button>
+        `;
+    }
+}
+
+function goToPage(page) {
+    currentPage = page;
+    displayMessages();
+}
+
+// ACTION BUTTONS
 function buildActions(msg) {
     let buttons = "";
 
@@ -149,7 +184,7 @@ function displayAppointments(appointments) {
     });
 }
 
-// APPOINTMENT ACTIONS (Styled)
+// APPOINTMENT ACTIONS
 function buildAppointmentActions(app) {
     let buttons = "";
 
@@ -190,7 +225,7 @@ function logout() {
     window.location.href = "login.html";
 }
 
-//Admin analytics
+// STATS
 function loadStats() {
     fetch("http://localhost:8080/api/admin/stats", {
         headers: { "Authorization": "Bearer " + token }
@@ -203,50 +238,13 @@ function displayStats(stats) {
     const container = document.getElementById("statsContainer");
 
     container.innerHTML = `
-        <div class="stat-card">
-            <h3>${stats.totalMessages}</h3>
-            <p>Total Messages</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>${stats.newMessages}</h3>
-            <p>New</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>${stats.inProgressMessages}</h3>
-            <p>In Progress</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>${stats.closedMessages}</h3>
-            <p>Closed</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>${stats.totalAppointments}</h3>
-            <p>Appointments</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>${stats.pendingAppointments}</h3>
-            <p>Pending</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>${stats.approvedAppointments}</h3>
-            <p>Approved</p>
-        </div>
-
-        <div class="stat-card">
-            <h3>${stats.completedAppointments}</h3>
-            <p>Completed</p>
-        </div>
+        <div class="stat-card"><h3>${stats.totalMessages}</h3><p>Total</p></div>
+        <div class="stat-card"><h3>${stats.newMessages}</h3><p>New</p></div>
+        <div class="stat-card"><h3>${stats.inProgressMessages}</h3><p>In Progress</p></div>
+        <div class="stat-card"><h3>${stats.closedMessages}</h3><p>Closed</p></div>
+        <div class="stat-card"><h3>${stats.totalAppointments}</h3><p>Appointments</p></div>
+        <div class="stat-card"><h3>${stats.pendingAppointments}</h3><p>Pending</p></div>
+        <div class="stat-card"><h3>${stats.approvedAppointments}</h3><p>Approved</p></div>
+        <div class="stat-card"><h3>${stats.completedAppointments}</h3><p>Completed</p></div>
     `;
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadStats();
-    loadMessages();
-    loadAppointments();
-});
