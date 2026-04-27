@@ -1,23 +1,47 @@
 const token = localStorage.getItem("token");
 
 if (!token) {
-    alert("Please login first");
-    window.location.href = "login.html";
+    showToast("Please login first", "warning");
+    setTimeout(() => window.location.href = "login.html", 1500);
 }
 
+// toast
+function showToast(message, type = "info") {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+// auth
+function handleAuth(res) {
+    if (res.status === 401 || res.status === 403) {
+        showToast("Session expired", "error");
+        setTimeout(logout, 1500);
+        throw new Error("Unauthorized");
+    }
+    return res;
+}
+
+// load
 document.addEventListener("DOMContentLoaded", () => {
     loadMyMessages();
     loadMyAppointments();
 });
 
-//MESSAGES
 function loadMyMessages() {
     fetch("http://localhost:8080/api/user/messages", {
-        headers: { "Authorization": "Bearer " + token }
+        headers: { Authorization: "Bearer " + token }
     })
-        .then(res => handleAuth(res))
+        .then(handleAuth)
         .then(res => res.json())
-        .then(data => displayMyMessages(data));
+        .then(displayMyMessages)
+        .catch(err => showToast(err.message, "error"));
 }
 
 function displayMyMessages(messages) {
@@ -37,14 +61,14 @@ function displayMyMessages(messages) {
     });
 }
 
-//APPOINTMENTS
 function loadMyAppointments() {
     fetch("http://localhost:8080/api/user/appointments", {
-        headers: { "Authorization": "Bearer " + token }
+        headers: { Authorization: "Bearer " + token }
     })
-        .then(res => handleAuth(res))
+        .then(handleAuth)
         .then(res => res.json())
-        .then(data => displayMyAppointments(data));
+        .then(displayMyAppointments)
+        .catch(err => showToast(err.message, "error"));
 }
 
 function displayMyAppointments(apps) {
@@ -64,22 +88,8 @@ function displayMyAppointments(apps) {
     });
 }
 
-//UTIL
 function formatDate(date) {
     return date ? new Date(date).toLocaleString() : "-";
-}
-
-function handleAuth(res) {
-    if (res.status === 401 || res.status === 403) {
-        alert("Session expired. Login again.");
-        logout();
-        throw new Error("Unauthorized");
-    }
-    return res;
-}
-
-function goToMessages() {
-    window.location.href = "message.html";
 }
 
 function logout() {

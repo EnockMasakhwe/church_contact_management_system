@@ -1,14 +1,41 @@
 const token = localStorage.getItem("token");
 
 if (!token) {
-    alert("Please login first");
-    window.location.href = "login.html";
+    showToast("Please login first", "warning");
+    setTimeout(() => window.location.href = "login.html", 1500);
 }
 
-// FORM LOGIC
+// toast
+function showToast(message, type = "info") {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+// response handler
+async function handleResponse(res) {
+    if (!res.ok) {
+        let msg = "Request failed";
+        try {
+            const data = await res.json();
+            msg = data.message || data.error || msg;
+        } catch {
+            msg = await res.text();
+        }
+        throw new Error(msg);
+    }
+    return res;
+}
+
+// form logic
 function handleTypeChange() {
     const type = document.getElementById("type").value;
-
     const locationField = document.getElementById("location");
     const calendarSection = document.getElementById("calendarSection");
 
@@ -22,12 +49,12 @@ function handleTypeChange() {
         }
         locationField.style.display = "none";
         calendarSection.style.display = "none";
-
         locationField.value = "";
         document.getElementById("preferredDateTime").value = "";
     }
 }
 
+// submit form
 function submitForm(event) {
     event.preventDefault();
 
@@ -36,17 +63,17 @@ function submitForm(event) {
     const preferredDateTime = document.getElementById("preferredDateTime").value;
 
     if (!type) {
-        alert("Please select a request type");
+        showToast("Select a request type", "warning");
         return;
     }
 
     if (type === "VISITATION_REQUEST") {
         if (!location) {
-            alert("Location is required");
+            showToast("Location is required", "warning");
             return;
         }
         if (!preferredDateTime) {
-            alert("Please select a time");
+            showToast("Select a time", "warning");
             return;
         }
     }
@@ -67,16 +94,9 @@ function submitForm(event) {
         },
         body: JSON.stringify(payload)
     })
-        .then(async res => {
-            const text = await res.text();
-
-            if (!res.ok) {
-                console.error("Backend error:", text);
-                alert(text || "Request failed");
-                return;
-            }
-
-            document.getElementById("successMessage").innerText = "Message sent successfully!";
+        .then(handleResponse)
+        .then(() => {
+            showToast("Message sent successfully", "success");
             document.getElementById("contactForm").reset();
 
             if (selectedSlot) {
@@ -87,16 +107,24 @@ function submitForm(event) {
             loadCalendar();
         })
         .catch(err => {
-            console.error(err);
-            alert("Something went wrong");
+            if (err.message.toLowerCase().includes("unauthorized")) {
+                showToast("Session expired", "error");
+                setTimeout(logout, 1500);
+            } else {
+                showToast(err.message, "error");
+            }
         });
 }
 
-// CALENDAR LOGIC
+// calendar
 async function loadCalendar() {
-    const res = await fetch("http://localhost:8080/api/appointments/public");
-    const appointments = await res.json();
-    renderCalendar(appointments);
+    try {
+        const res = await fetch("http://localhost:8080/api/appointments/public");
+        const data = await res.json();
+        renderCalendar(data);
+    } catch (err) {
+        showToast("Failed to load calendar", "error");
+    }
 }
 
 function renderCalendar(appointments) {
@@ -151,16 +179,17 @@ function renderCalendar(appointments) {
     }
 }
 
+// slot selection
 let selectedSlot = null;
 
 function formatLocalDateTime(date) {
-    const pad = (n) => n.toString().padStart(2, '0');
+    const pad = n => n.toString().padStart(2, '0');
 
     return date.getFullYear() + '-' +
         pad(date.getMonth() + 1) + '-' +
         pad(date.getDate()) + 'T' +
         pad(date.getHours()) + ':' +
-        pad(date.getMinutes()) + ':' + '00';
+        pad(date.getMinutes()) + ':00';
 }
 
 function selectSlot(dateTime, element) {
@@ -171,19 +200,20 @@ function selectSlot(dateTime, element) {
     element.classList.add("selected");
     selectedSlot = element;
 
-    const formatted = formatLocalDateTime(dateTime);
-    document.getElementById("preferredDateTime").value = formatted;
+    document.getElementById("preferredDateTime").value =
+        formatLocalDateTime(dateTime);
 }
 
+// init
 document.addEventListener("DOMContentLoaded", loadCalendar);
 
+// nav
 function goToDashboard() {
     window.location.href = "user.html";
 }
 
-// LOGOUT
+// logout
 function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    localStorage.clear();
     window.location.href = "login.html";
 }
