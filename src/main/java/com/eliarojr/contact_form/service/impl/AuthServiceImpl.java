@@ -100,7 +100,7 @@ public class AuthServiceImpl implements AuthService {
 
         //Check password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new IllegalArgumentException("Invalid email or password!");
         }
 
         //Generate JWT

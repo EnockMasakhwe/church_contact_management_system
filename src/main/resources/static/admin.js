@@ -3,12 +3,13 @@ const role = localStorage.getItem("role");
 
 if (!token || (role !== "ROLE_ADMIN" && role !== "ROLE_SUPER_ADMIN")) {
     showToast("Access denied", "error");
-    setTimeout(() => window.location.href = "login.html", 1500);
+    window.location.href = "login.html";
 }
 
 let allMessages = [];
 let filteredMessages = [];
 
+// pagination
 let currentPage = 1;
 const rowsPerPage = 8;
 
@@ -18,48 +19,36 @@ document.addEventListener("DOMContentLoaded", () => {
     loadAppointments();
 });
 
-// toast
-function showToast(message, type = "info") {
-    const container = document.getElementById("toastContainer");
-    if (!container) return;
+// safe response handler
+async function handleResponse(res) {
+    let data;
 
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.innerText = message;
-
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
-}
-
-// response handler
-async function handleResponse(response) {
-    if (!response.ok) {
-        let msg = "Request failed";
+    try {
+        data = await res.json();
+    } catch {
         try {
-            const data = await response.json();
-            msg = data.message || data.error || msg;
+            data = await res.text();
         } catch {
-            msg = await response.text();
+            data = null;
         }
-        throw new Error(msg);
     }
-    return response.json();
+
+    if (!res.ok) {
+        const message =
+            (data && data.message) ||
+            (typeof data === "string" && data) ||
+            "Request failed";
+
+        throw new Error(message);
+    }
+
+    return data;
 }
 
-// auth error
-function handleAuthError(err) {
-    if (err.message.toLowerCase().includes("unauthorized")) {
-        showToast("Session expired", "error");
-        setTimeout(logout, 1500);
-    } else {
-        showToast(err.message, "error");
-    }
-}
-
-// load messages
+// LOAD MESSAGES
 function loadMessages() {
     fetch("http://localhost:8080/api/admin/messages", {
-        headers: { Authorization: "Bearer " + token }
+        headers: { "Authorization": "Bearer " + token }
     })
         .then(handleResponse)
         .then(data => {
@@ -68,10 +57,10 @@ function loadMessages() {
             currentPage = 1;
             displayMessages();
         })
-        .catch(handleAuthError);
+        .catch(err => showToast(err.message, "error"));
 }
 
-// display messages
+// DISPLAY MESSAGES
 function displayMessages() {
     const table = document.getElementById("messageTable");
     table.innerHTML = "";
@@ -98,25 +87,29 @@ function displayMessages() {
     renderPagination();
 }
 
-// filter
+// FILTER
 function filterMessages() {
     const search = document.getElementById("searchInput").value.toLowerCase();
     const status = document.getElementById("statusFilter").value;
     const type = document.getElementById("typeFilter").value;
 
-    filteredMessages = allMessages.filter(msg =>
-        (msg.message?.toLowerCase().includes(search) ||
+    filteredMessages = allMessages.filter(msg => {
+        const matchesSearch =
+            msg.message?.toLowerCase().includes(search) ||
             msg.name?.toLowerCase().includes(search) ||
-            msg.email?.toLowerCase().includes(search)) &&
-        (!status || msg.status === status) &&
-        (!type || msg.type === type)
-    );
+            msg.email?.toLowerCase().includes(search);
+
+        const matchesStatus = status ? msg.status === status : true;
+        const matchesType = type ? msg.type === type : true;
+
+        return matchesSearch && matchesStatus && matchesType;
+    });
 
     currentPage = 1;
     displayMessages();
 }
 
-// pagination
+// pagination UI
 function renderPagination() {
     const totalPages = Math.ceil(filteredMessages.length / rowsPerPage);
     const container = document.getElementById("pagination");
@@ -127,7 +120,7 @@ function renderPagination() {
     for (let i = 1; i <= totalPages; i++) {
         container.innerHTML += `
             <button class="page-btn ${i === currentPage ? "active-page" : ""}"
-            onclick="goToPage(${i})">${i}</button>
+                onclick="goToPage(${i})">${i}</button>
         `;
     }
 }
@@ -137,29 +130,35 @@ function goToPage(page) {
     displayMessages();
 }
 
-// actions
+// ACTIONS
 function buildActions(msg) {
-    let btn = "";
+    let buttons = "";
 
-    if (msg.status === "NEW")
-        btn += `<button class="action-btn read-btn" onclick="updateStatus(${msg.id},'READ')">Read</button>`;
-    if (msg.status === "READ")
-        btn += `<button class="action-btn progress-btn" onclick="updateStatus(${msg.id},'IN_PROGRESS')">Start</button>`;
-    if (msg.status === "IN_PROGRESS")
-        btn += `<button class="action-btn respond-btn" onclick="updateStatus(${msg.id},'RESPONDED')">Respond</button>`;
-    if (msg.status === "RESPONDED")
-        btn += `<button class="action-btn close-btn" onclick="updateStatus(${msg.id},'CLOSED')">Close</button>`;
+    if (msg.status === "NEW") {
+        buttons += `<button class="action-btn read-btn" onclick="updateStatus(${msg.id}, 'READ')">Read</button>`;
+    }
+    if (msg.status === "READ") {
+        buttons += `<button class="action-btn progress-btn" onclick="updateStatus(${msg.id}, 'IN_PROGRESS')">Start</button>`;
+    }
+    if (msg.status === "IN_PROGRESS") {
+        buttons += `<button class="action-btn respond-btn" onclick="updateStatus(${msg.id}, 'RESPONDED')">Respond</button>`;
+    }
+    if (msg.status === "RESPONDED") {
+        buttons += `<button class="action-btn close-btn" onclick="updateStatus(${msg.id}, 'CLOSED')">Close</button>`;
+    }
 
-    btn += `<button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">Delete</button>`;
-    return btn;
+    buttons += `<button class="action-btn delete-btn" onclick="deleteMessage(${msg.id})">Delete</button>`;
+
+    return buttons;
 }
 
+// UPDATE STATUS
 function updateStatus(id, status) {
     fetch(`http://localhost:8080/api/admin/messages/${id}/status`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + token
+            "Authorization": "Bearer " + token
         },
         body: JSON.stringify({ status })
     })
@@ -168,30 +167,31 @@ function updateStatus(id, status) {
             showToast("Status updated", "success");
             loadMessages();
         })
-        .catch(handleAuthError);
+        .catch(err => showToast(err.message, "error"));
 }
 
+// DELETE
 function deleteMessage(id) {
     fetch(`http://localhost:8080/api/admin/messages/${id}`, {
         method: "DELETE",
-        headers: { Authorization: "Bearer " + token }
+        headers: { "Authorization": "Bearer " + token }
     })
         .then(handleResponse)
         .then(() => {
             showToast("Message deleted", "success");
             loadMessages();
         })
-        .catch(handleAuthError);
+        .catch(err => showToast(err.message, "error"));
 }
 
-// appointments
+// APPOINTMENTS
 function loadAppointments() {
     fetch("http://localhost:8080/api/admin/appointments", {
-        headers: { Authorization: "Bearer " + token }
+        headers: { "Authorization": "Bearer " + token }
     })
         .then(handleResponse)
-        .then(displayAppointments)
-        .catch(handleAuthError);
+        .then(data => displayAppointments(data))
+        .catch(err => showToast(err.message, "error"));
 }
 
 function displayAppointments(apps) {
@@ -214,42 +214,43 @@ function displayAppointments(apps) {
     });
 }
 
+// APPOINTMENT ACTIONS
 function buildAppointmentActions(app) {
-    let btn = "";
+    let buttons = "";
 
     if (app.status === "PENDING") {
-        btn += `<button class="action-btn read-btn" onclick="updateAppointmentStatus(${app.id},'APPROVED')">Approve</button>`;
-        btn += `<button class="action-btn delete-btn" onclick="updateAppointmentStatus(${app.id},'REJECTED')">Reject</button>`;
+        buttons += `<button class="action-btn read-btn" onclick="updateAppointmentStatus(${app.id}, 'APPROVED')">Approve</button>`;
+        buttons += `<button class="action-btn delete-btn" onclick="updateAppointmentStatus(${app.id}, 'REJECTED')">Reject</button>`;
     }
 
     if (app.status === "APPROVED") {
-        btn += `<button class="action-btn progress-btn" onclick="updateAppointmentStatus(${app.id},'COMPLETED')">Complete</button>`;
+        buttons += `<button class="action-btn progress-btn" onclick="updateAppointmentStatus(${app.id}, 'COMPLETED')">Complete</button>`;
     }
 
-    return btn;
+    return buttons;
 }
 
 function updateAppointmentStatus(id, status) {
     fetch(`http://localhost:8080/api/admin/appointments/${id}/status?status=${status}`, {
         method: "PUT",
-        headers: { Authorization: "Bearer " + token }
+        headers: { "Authorization": "Bearer " + token }
     })
         .then(handleResponse)
         .then(() => {
             showToast("Appointment updated", "success");
             loadAppointments();
         })
-        .catch(handleAuthError);
+        .catch(err => showToast(err.message, "error"));
 }
 
-// stats
+// STATS
 function loadStats() {
     fetch("http://localhost:8080/api/admin/stats", {
-        headers: { Authorization: "Bearer " + token }
+        headers: { "Authorization": "Bearer " + token }
     })
         .then(handleResponse)
-        .then(displayStats)
-        .catch(handleAuthError);
+        .then(data => displayStats(data))
+        .catch(err => showToast(err.message, "error"));
 }
 
 function displayStats(stats) {
@@ -267,9 +268,17 @@ function displayStats(stats) {
     `;
 }
 
-// util
+// UTIL
 function formatDate(date) {
     return date ? new Date(date).toLocaleString() : "-";
+}
+
+function goToDashboard() {
+    window.location.href = "user.html";
+}
+
+function goToMessages() {
+    window.location.href = "message.html";
 }
 
 function logout() {

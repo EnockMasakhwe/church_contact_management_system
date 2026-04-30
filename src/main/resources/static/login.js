@@ -18,16 +18,19 @@ function showToast(message, type = "info") {
     setTimeout(() => toast.remove(), 4000);
 }
 
-// response
+// response handler (FIXED)
 async function handleResponse(response) {
     if (!response.ok) {
-        let msg = "Login failed";
+        let msg = "Request failed";
+
         try {
             const data = await response.json();
-            msg = data.message || msg;
+            msg = data.message || JSON.stringify(data);
         } catch {
-            msg = await response.text();
+            const text = await response.text();
+            if (text) msg = text;
         }
+
         throw new Error(msg);
     }
     return response.json();
