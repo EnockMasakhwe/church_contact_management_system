@@ -18,7 +18,7 @@ function showToast(message, type = "info") {
     setTimeout(() => toast.remove(), 4000);
 }
 
-// response handler (FIXED)
+// response
 async function handleResponse(response) {
     if (!response.ok) {
         let msg = "Request failed";
@@ -66,3 +66,36 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
         showToast(err.message, "error");
     }
 });
+
+// toggle forgot password
+function toggleForgotPassword() {
+    const box = document.getElementById("forgotPasswordBox");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+// send reset link
+async function sendResetLink() {
+    const email = document.getElementById("forgotEmail").value;
+
+    if (!email) {
+        showToast("Enter your email", "error");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:8080/api/auth/forgot-password", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ email })
+        });
+
+        const msg = await res.text();
+
+        if (!res.ok) throw new Error(msg);
+
+        showToast(msg || "Reset link sent", "success");
+
+    } catch (err) {
+        showToast(err.message, "error");
+    }
+}

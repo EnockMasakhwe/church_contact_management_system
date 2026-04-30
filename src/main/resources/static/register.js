@@ -1,3 +1,4 @@
+// toast
 function showToast(message, type = "info") {
     const container = document.getElementById("toastContainer");
     if (!container) return;
@@ -10,7 +11,7 @@ function showToast(message, type = "info") {
     setTimeout(() => toast.remove(), 4000);
 }
 
-// response handler (FIXED)
+// response
 async function handleResponse(response) {
     if (!response.ok) {
         let msg = "Request failed";
@@ -32,15 +33,15 @@ async function handleResponse(response) {
 document.getElementById("registerForm").addEventListener("submit", async e => {
     e.preventDefault();
 
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
     try {
         const res = await fetch("http://localhost:8080/api/auth/register", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                username: username.value,
-                email: email.value,
-                password: password.value
-            })
+            body: JSON.stringify({ username, email, password })
         });
 
         await handleResponse(res);
