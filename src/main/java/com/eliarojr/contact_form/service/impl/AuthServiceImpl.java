@@ -7,6 +7,9 @@ import com.eliarojr.contact_form.entity.PasswordResetToken;
 import com.eliarojr.contact_form.entity.enums.Role;
 import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.entity.VerificationToken;
+import com.eliarojr.contact_form.exception.BadRequestException;
+import com.eliarojr.contact_form.exception.ResourceNotFoundException;
+import com.eliarojr.contact_form.exception.UnauthorizedException;
 import com.eliarojr.contact_form.repository.PasswordResetTokenRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.repository.VerificationTokenRepository;
@@ -19,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("Email already exits!");
+            throw new BadRequestException("Email already exists");
         }
 
         User user =  new User();
@@ -73,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
 
         VerificationToken verificationToken = verificationTokenRepository
                 .findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+                .orElseThrow(() -> new BadRequestException("Invalid token"));
 
         if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token expired");
@@ -92,15 +96,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.getEmail());
-                //.orElseThrow(() -> new RuntimeException("User not found"));
+        User user = Optional.ofNullable(userRepository.findByEmail(request.getEmail()))
+                .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
+
         if (!user.isEnabled()) {
-            throw new RuntimeException("Please verify your email before logging in.");
+            throw new UnauthorizedException("Please verify your email before logging in");
         }
 
         //Check password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid email or password!");
+            throw new UnauthorizedException("Invalid email or password!");
         }
 
         //Generate JWT
@@ -118,8 +123,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void createPasswordResetToken(String email) {
 
-        User user = userRepository.findByEmail(email);
-               // .orElseThrow(() -> new RuntimeException("User not found"));//
+        User user = Optional.ofNullable(userRepository.findByEmail(email))
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = UUID.randomUUID().toString();
 
@@ -139,7 +144,7 @@ public class AuthServiceImpl implements AuthService {
     public void resetPassword(String token, String newPassword) {
 
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+                .orElseThrow(() -> new BadRequestException("Invalid token"));
 
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token expired");

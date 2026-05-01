@@ -2,6 +2,8 @@ package com.eliarojr.contact_form.service.impl;
 
 import com.eliarojr.contact_form.dto.AppointmentResponse;
 import com.eliarojr.contact_form.dto.MessageResponse;
+import com.eliarojr.contact_form.exception.ResourceNotFoundException;
+import com.eliarojr.contact_form.exception.UnauthorizedException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.MessageRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +31,8 @@ public class UserServiceImpl implements UserService {
                 .getPrincipal())
                 .getUsername();
 
-        return userRepository.findByEmail(email)
-                //.orElseThrow(() -> new RuntimeException("User not found"))
+        return Optional.ofNullable(userRepository.findByEmail(email))
+                .orElseThrow(() -> new UnauthorizedException("User not found"))
                 .getId();
     }
 

@@ -8,6 +8,9 @@ import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
 import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.entity.enums.MessageType;
+import com.eliarojr.contact_form.exception.BadRequestException;
+import com.eliarojr.contact_form.exception.ResourceNotFoundException;
+import com.eliarojr.contact_form.exception.UnauthorizedException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.MessageRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.eliarojr.contact_form.entity.enums.MessageType.VISITATION_REQUEST;
 import static org.hibernate.internal.util.StringHelper.isBlank;
@@ -49,8 +53,8 @@ public class MessageServiceImpl implements MessageService {
                 .getPrincipal())
                 .getUsername();
 
-        User user = userRepository.findByEmail(email);
-                //.orElseThrow(() -> new RuntimeException("User not found"));
+        User user = Optional.ofNullable(userRepository.findByEmail(email))
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         MessageType type = MessageType.valueOf(String.valueOf(request.getType()));
 
@@ -58,11 +62,11 @@ public class MessageServiceImpl implements MessageService {
         if (type == MessageType.VISITATION_REQUEST) {
 
             if (isBlank(request.getLocation())) {
-                throw new IllegalArgumentException("Location required");
+                throw new BadRequestException("Location required");
             }
 
             if (request.getPreferredDateTime() == null) {
-                throw new IllegalArgumentException("Date/time required");
+                throw new BadRequestException("Date/time required");
             }
 
             LocalDateTime start = request.getPreferredDateTime();
@@ -72,7 +76,7 @@ public class MessageServiceImpl implements MessageService {
                     appointmentRepository.findConflictingAppointments(start, end);
 
             if (!conflicts.isEmpty()) {
-                throw new RuntimeException("Time slot already booked");
+                throw new BadRequestException("Selected time slot already booked");
             }
         }
 

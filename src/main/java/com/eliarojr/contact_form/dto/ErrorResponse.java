@@ -1,4 +1,4 @@
-package com.eliarojr.contact_form.exception;
+package com.eliarojr.contact_form.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
