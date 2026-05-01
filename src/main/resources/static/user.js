@@ -5,47 +5,31 @@ if (!token) {
     setTimeout(() => window.location.href = "login.html", 1500);
 }
 
-// toast
-function showToast(message, type = "info") {
-    const container = document.getElementById("toastContainer");
-    if (!container) return;
-
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.innerText = message;
-
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
-}
-
-// auth
-function handleAuth(res) {
-    if (res.status === 401 || res.status === 403) {
-        showToast("Session expired", "error");
-        setTimeout(logout, 1500);
-        throw new Error("Unauthorized");
-    }
-    return res;
-}
-
 // load
 document.addEventListener("DOMContentLoaded", () => {
     loadMyMessages();
     loadMyAppointments();
 });
 
-function loadMyMessages() {
-    fetch("http://localhost:8080/api/user/messages", {
-        headers: { Authorization: "Bearer " + token }
-    })
-        .then(handleAuth)
-        .then(res => res.json())
-        .then(displayMyMessages)
-        .catch(err => showToast(err.message, "error"));
+async function loadMyMessages() {
+    try {
+        const messages = await apiFetch("http://localhost:8080/api/user/messages");
+        displayMyMessages(messages);
+    } catch (err) {
+        // Check if it's an auth error
+        if (err.message === "Unauthorized" || err.message.includes("401") || err.message.includes("403")) {
+            showToast("Session expired", "error");
+            setTimeout(logout, 1500);
+        }
+        // Toast is already shown by apiFetch, but you can add custom handling here
+        console.error(err);
+    }
 }
 
 function displayMyMessages(messages) {
     const table = document.getElementById("myMessagesTable");
+    if (!table) return;
+
     table.innerHTML = "";
 
     messages.forEach(msg => {
@@ -61,18 +45,24 @@ function displayMyMessages(messages) {
     });
 }
 
-function loadMyAppointments() {
-    fetch("http://localhost:8080/api/user/appointments", {
-        headers: { Authorization: "Bearer " + token }
-    })
-        .then(handleAuth)
-        .then(res => res.json())
-        .then(displayMyAppointments)
-        .catch(err => showToast(err.message, "error"));
+async function loadMyAppointments() {
+    try {
+        const appointments = await apiFetch("http://localhost:8080/api/user/appointments");
+        displayMyAppointments(appointments);
+    } catch (err) {
+        // Check if it's an auth error
+        if (err.message === "Unauthorized" || err.message.includes("401") || err.message.includes("403")) {
+            showToast("Session expired", "error");
+            setTimeout(logout, 1500);
+        }
+        console.error(err);
+    }
 }
 
 function displayMyAppointments(apps) {
     const table = document.getElementById("myAppointmentsTable");
+    if (!table) return;
+
     table.innerHTML = "";
 
     apps.forEach(app => {

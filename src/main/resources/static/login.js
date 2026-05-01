@@ -5,52 +5,18 @@ if (token) {
     window.location.href = role === "ROLE_ADMIN" ? "admin.html" : "message.html";
 }
 
-// toast
-function showToast(message, type = "info") {
-    const container = document.getElementById("toastContainer");
-    if (!container) return;
-
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.innerText = message;
-
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
-}
-
-// response
-async function handleResponse(response) {
-    if (!response.ok) {
-        let msg = "Request failed";
-
-        try {
-            const data = await response.json();
-            msg = data.message || JSON.stringify(data);
-        } catch {
-            const text = await response.text();
-            if (text) msg = text;
-        }
-
-        throw new Error(msg);
-    }
-    return response.json();
-}
-
 // login
 document.getElementById("loginForm").addEventListener("submit", async e => {
     e.preventDefault();
 
     try {
-        const res = await fetch("http://localhost:8080/api/auth/login", {
+        const data = await apiFetch("http://localhost:8080/api/auth/login", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                email: email.value,
-                password: password.value
+                email: this.email.value,
+                password: this.password.value
             })
         });
-
-        const data = await handleResponse(res);
 
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
@@ -83,15 +49,10 @@ async function sendResetLink() {
     }
 
     try {
-        const res = await fetch("http://localhost:8080/api/auth/forgot-password", {
+        const msg = await apiFetch("http://localhost:8080/api/auth/forgot-password", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ email })
         });
-
-        const msg = await res.text();
-
-        if (!res.ok) throw new Error(msg);
 
         showToast(msg || "Reset link sent", "success");
 

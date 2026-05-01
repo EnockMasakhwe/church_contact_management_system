@@ -19,38 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
     loadAppointments();
 });
 
-// safe response handler
-async function handleResponse(res) {
-    let data;
-
-    try {
-        data = await res.json();
-    } catch {
-        try {
-            data = await res.text();
-        } catch {
-            data = null;
-        }
-    }
-
-    if (!res.ok) {
-        const message =
-            (data && data.message) ||
-            (typeof data === "string" && data) ||
-            "Request failed";
-
-        throw new Error(message);
-    }
-
-    return data;
-}
-
 // LOAD MESSAGES
 function loadMessages() {
-    fetch("http://localhost:8080/api/admin/messages", {
-        headers: { "Authorization": "Bearer " + token }
-    })
-        .then(handleResponse)
+    apiFetch("http://localhost:8080/api/admin/messages")
         .then(data => {
             allMessages = data;
             filteredMessages = data;
@@ -154,15 +125,10 @@ function buildActions(msg) {
 
 // UPDATE STATUS
 function updateStatus(id, status) {
-    fetch(`http://localhost:8080/api/admin/messages/${id}/status`, {
+    apiFetch(`http://localhost:8080/api/admin/messages/${id}/status`, {
         method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
         body: JSON.stringify({ status })
     })
-        .then(handleResponse)
         .then(() => {
             showToast("Status updated", "success");
             loadMessages();
@@ -172,11 +138,9 @@ function updateStatus(id, status) {
 
 // DELETE
 function deleteMessage(id) {
-    fetch(`http://localhost:8080/api/admin/messages/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": "Bearer " + token }
+    apiFetch(`http://localhost:8080/api/admin/messages/${id}`, {
+        method: "DELETE"
     })
-        .then(handleResponse)
         .then(() => {
             showToast("Message deleted", "success");
             loadMessages();
@@ -186,10 +150,7 @@ function deleteMessage(id) {
 
 // APPOINTMENTS
 function loadAppointments() {
-    fetch("http://localhost:8080/api/admin/appointments", {
-        headers: { "Authorization": "Bearer " + token }
-    })
-        .then(handleResponse)
+    apiFetch("http://localhost:8080/api/admin/appointments")
         .then(data => displayAppointments(data))
         .catch(err => showToast(err.message, "error"));
 }
@@ -231,11 +192,9 @@ function buildAppointmentActions(app) {
 }
 
 function updateAppointmentStatus(id, status) {
-    fetch(`http://localhost:8080/api/admin/appointments/${id}/status?status=${status}`, {
-        method: "PUT",
-        headers: { "Authorization": "Bearer " + token }
+    apiFetch(`http://localhost:8080/api/admin/appointments/${id}/status?status=${status}`, {
+        method: "PUT"
     })
-        .then(handleResponse)
         .then(() => {
             showToast("Appointment updated", "success");
             loadAppointments();
@@ -245,10 +204,7 @@ function updateAppointmentStatus(id, status) {
 
 // STATS
 function loadStats() {
-    fetch("http://localhost:8080/api/admin/stats", {
-        headers: { "Authorization": "Bearer " + token }
-    })
-        .then(handleResponse)
+    apiFetch("http://localhost:8080/api/admin/stats")
         .then(data => displayStats(data))
         .catch(err => showToast(err.message, "error"));
 }

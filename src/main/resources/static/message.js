@@ -5,34 +5,6 @@ if (!token) {
     setTimeout(() => window.location.href = "login.html", 1500);
 }
 
-// toast
-function showToast(message, type = "info") {
-    const container = document.getElementById("toastContainer");
-    if (!container) return;
-
-    const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
-    toast.innerText = message;
-
-    container.appendChild(toast);
-    setTimeout(() => toast.remove(), 4000);
-}
-
-// response handler
-async function handleResponse(res) {
-    if (!res.ok) {
-        let msg = "Request failed";
-        try {
-            const data = await res.json();
-            msg = data.message || data.error || msg;
-        } catch {
-            msg = await res.text();
-        }
-        throw new Error(msg);
-    }
-    return res;
-}
-
 // form logic
 function handleTypeChange() {
     const type = document.getElementById("type").value;
@@ -86,15 +58,10 @@ function submitForm(event) {
         preferredDateTime: preferredDateTime || null
     };
 
-    fetch("http://localhost:8080/api/messages", {
+    apiFetch("http://localhost:8080/api/messages", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
         body: JSON.stringify(payload)
     })
-        .then(handleResponse)
         .then(() => {
             showToast("Message sent successfully", "success");
             document.getElementById("contactForm").reset();
@@ -119,8 +86,7 @@ function submitForm(event) {
 // calendar
 async function loadCalendar() {
     try {
-        const res = await fetch("http://localhost:8080/api/appointments/public");
-        const data = await res.json();
+        const data = await apiFetch("http://localhost:8080/api/appointments/public");
         renderCalendar(data);
     } catch (err) {
         showToast("Failed to load calendar", "error");
