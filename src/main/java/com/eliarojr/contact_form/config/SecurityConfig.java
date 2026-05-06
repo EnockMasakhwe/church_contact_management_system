@@ -1,7 +1,6 @@
 package com.eliarojr.contact_form.config;
 
 import com.eliarojr.contact_form.security.JwtAuthenticationFilter;
-import com.eliarojr.contact_form.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

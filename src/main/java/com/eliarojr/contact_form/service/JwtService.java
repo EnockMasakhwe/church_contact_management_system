@@ -1,4 +1,4 @@
-package com.eliarojr.contact_form.security;
+package com.eliarojr.contact_form.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

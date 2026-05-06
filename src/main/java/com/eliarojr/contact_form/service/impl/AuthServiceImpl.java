@@ -13,7 +13,7 @@ import com.eliarojr.contact_form.exception.UnauthorizedException;
 import com.eliarojr.contact_form.repository.PasswordResetTokenRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.repository.VerificationTokenRepository;
-import com.eliarojr.contact_form.security.JwtService;
+import com.eliarojr.contact_form.service.JwtService;
 import com.eliarojr.contact_form.service.AuthService;
 import com.eliarojr.contact_form.service.EmailService;
 import jakarta.transaction.Transactional;
