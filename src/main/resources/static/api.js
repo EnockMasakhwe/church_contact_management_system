@@ -1,3 +1,5 @@
+const BASE_URL = "https://contact_form.up.railway.app";
+
 // show toast
 function showToast(message, type = "error") {
     const container = document.getElementById("toastContainer");

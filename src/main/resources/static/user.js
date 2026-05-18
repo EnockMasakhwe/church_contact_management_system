@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadMyMessages() {
     try {
-        const messages = await apiFetch("http://localhost:8080/api/user/messages");
+        const messages = await apiFetch("${BASE_URL}/api/user/messages");
         displayMyMessages(messages);
     } catch (err) {
         // Check if it's an auth error
@@ -47,7 +47,7 @@ function displayMyMessages(messages) {
 
 async function loadMyAppointments() {
     try {
-        const appointments = await apiFetch("http://localhost:8080/api/user/appointments");
+        const appointments = await apiFetch("${BASE_URL}/api/user/appointments");
         displayMyAppointments(appointments);
     } catch (err) {
         // Check if it's an auth error

@@ -10,7 +10,7 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
     e.preventDefault();
 
     try {
-        const data = await apiFetch("http://localhost:8080/api/auth/login", {
+        const data = await apiFetch("${BASE_URL}/api/auth/login", {
             method: "POST",
             body: JSON.stringify({
                 email: this.email.value,
@@ -49,7 +49,7 @@ async function sendResetLink() {
     }
 
     try {
-        const msg = await apiFetch("http://localhost:8080/api/auth/forgot-password", {
+        const msg = await apiFetch(`${BASE_URL}/api/auth/forgot-password`, {
             method: "POST",
             body: JSON.stringify({ email })
         });
