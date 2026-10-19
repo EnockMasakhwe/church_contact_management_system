@@ -58,7 +58,7 @@ function submitForm(event) {
         preferredDateTime: preferredDateTime || null
     };
 
-    apiFetch("${BASE_URL}/api/messages", {
+    apiFetch("/api/messages", {
         method: "POST",
         body: JSON.stringify(payload)
     })
@@ -86,7 +86,7 @@ function submitForm(event) {
 // calendar
 async function loadCalendar() {
     try {
-        const data = await apiFetch("${BASE_URL}/api/appointments/public");
+        const data = await apiFetch("/api/appointments/public");
         renderCalendar(data);
     } catch (err) {
         showToast("Failed to load calendar", "error");

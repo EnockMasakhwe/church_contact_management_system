@@ -33,7 +33,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://contact-form-25p0.onrender.com")
+                        .allowedOrigins("http://localhost:8080")
                         .allowedMethods("*")
                         .allowedHeaders("*");
             }

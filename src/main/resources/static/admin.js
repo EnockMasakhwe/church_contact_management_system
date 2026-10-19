@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // LOAD MESSAGES
 function loadMessages() {
-    apiFetch("${BASE_URL}/api/admin/messages")
+    apiFetch("/api/admin/messages")
         .then(data => {
             allMessages = data;
             filteredMessages = data;
@@ -125,7 +125,7 @@ function buildActions(msg) {
 
 // UPDATE STATUS
 function updateStatus(id, status) {
-    apiFetch(`${BASE_URL}/api/admin/messages/${id}/status`, {
+    apiFetch(`/api/admin/messages/${id}/status`, {
         method: "PUT",
         body: JSON.stringify({ status })
     })
@@ -138,7 +138,7 @@ function updateStatus(id, status) {
 
 // DELETE
 function deleteMessage(id) {
-    apiFetch(`${BASE_URL}/api/admin/messages/${id}`, {
+    apiFetch(`/api/admin/messages/${id}`, {
         method: "DELETE"
     })
         .then(() => {
@@ -150,7 +150,7 @@ function deleteMessage(id) {
 
 // APPOINTMENTS
 function loadAppointments() {
-    apiFetch(`${BASE_URL}/api/admin/appointments`)
+    apiFetch("/api/admin/appointments")
         .then(data => displayAppointments(data))
         .catch(err => showToast(err.message, "error"));
 }
@@ -192,7 +192,7 @@ function buildAppointmentActions(app) {
 }
 
 function updateAppointmentStatus(id, status) {
-    apiFetch(`${BASE_URL}/api/admin/appointments/${id}/status?status=${status}`, {
+    apiFetch(`/api/admin/appointments/${id}/status?status=${status}`, {
         method: "PUT"
     })
         .then(() => {
@@ -204,7 +204,7 @@ function updateAppointmentStatus(id, status) {
 
 // STATS
 function loadStats() {
-    apiFetch(`${BASE_URL}/api/admin/stats`)
+    apiFetch("/api/admin/stats")
         .then(data => displayStats(data))
         .catch(err => showToast(err.message, "error"));
 }

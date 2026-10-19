@@ -1,21 +1,14 @@
-const token = localStorage.getItem("token");
-const role = localStorage.getItem("role");
-
-if (token) {
-    window.location.href = role === "ROLE_ADMIN" ? "admin.html" : "message.html";
-}
-
 // login
 document.getElementById("loginForm").addEventListener("submit", async e => {
     e.preventDefault();
 
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
     try {
-        const data = await apiFetch("${BASE_URL}/api/auth/login", {
+        const data = await apiFetch("/api/auth/login", {
             method: "POST",
-            body: JSON.stringify({
-                email: this.email.value,
-                password: this.password.value
-            })
+            body: JSON.stringify({ email, password })
         });
 
         localStorage.setItem("token", data.token);
@@ -49,7 +42,7 @@ async function sendResetLink() {
     }
 
     try {
-        const msg = await apiFetch(`${BASE_URL}/api/auth/forgot-password`, {
+        const msg = await apiFetch("/api/auth/forgot-password", {
             method: "POST",
             body: JSON.stringify({ email })
         });
