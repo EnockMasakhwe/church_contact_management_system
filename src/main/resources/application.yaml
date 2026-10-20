@@ -5,9 +5,9 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
-    username: [REDACTED]
+    username: ${DB_USERNAME}
 
-    password: [REDACTED]
+    password: ${DB_PASSWORD}
 
 
   jpa:
@@ -19,9 +19,9 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: [REDACTED]
+    username: ${MAIL_USERNAME}
 
-    password: [REDACTED]
+    password: ${MAIL_PASSWORD}
 
 
     properties:
@@ -34,6 +34,6 @@ spring:
         debug: true
 
 jwt:
-  secret: [REDACTED]
+  secret: ${JWT_SECRET}
 
   expiration: ${JWT_EXPIRATION}
