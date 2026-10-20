@@ -56,8 +56,9 @@ public class SecurityConfig {
                         //Public Calendar endpoint
                         .requestMatchers(HttpMethod.GET, "/api/appointments/public").permitAll()
 
-                        //User endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/messages").hasRole("USER")
+                        // All authenticated account roles can submit messages and visitation requests.
+                        .requestMatchers(HttpMethod.POST, "/api/messages")
+                        .hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
 
                         //Admin endpoints
                         .requestMatchers("/api/admin/**").hasAnyRole("ADMIN","SUPER_ADMIN")
