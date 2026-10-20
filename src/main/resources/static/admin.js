@@ -1,5 +1,6 @@
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
+const isSuperAdmin = role === "ROLE_SUPER_ADMIN";
 
 if (!token || (role !== "ROLE_ADMIN" && role !== "ROLE_SUPER_ADMIN")) {
     showToast("Access denied", "error");
@@ -17,7 +18,81 @@ document.addEventListener("DOMContentLoaded", () => {
     loadStats();
     loadMessages();
     loadAppointments();
+    loadUsers();
 });
+
+function loadUsers() {
+    apiFetch("/api/admin/users")
+        .then(users => displayUsers(users))
+        .catch(err => showToast(err.message, "error"));
+}
+
+function displayUsers(users) {
+    const table = document.getElementById("usersTable");
+    table.innerHTML = "";
+
+    users.forEach(user => {
+        const isProtectedSuperAdmin = user.role === "ROLE_SUPER_ADMIN";
+        let actions = "";
+
+        if (isSuperAdmin && !isProtectedSuperAdmin) {
+            const nextRole = user.role === "ROLE_ADMIN" ? "ROLE_USER" : "ROLE_ADMIN";
+            const actionLabel = nextRole === "ROLE_ADMIN" ? "Make admin" : "Remove admin";
+            actions += `<button class="action-btn progress-btn" onclick="updateUserRole(${user.id}, '${nextRole}')">${actionLabel}</button>`;
+        }
+
+        if (!isProtectedSuperAdmin) {
+            actions += `<button class="action-btn delete-btn" onclick="deleteUser(${user.id})">Delete</button>`;
+        }
+
+        table.innerHTML += `
+            <tr>
+                <td>${user.id}</td>
+                <td>${escapeHtml(user.username)}</td>
+                <td>${escapeHtml(user.email)}</td>
+                <td>${escapeHtml(user.role)}</td>
+                <td>${user.enabled ? "Yes" : "No"}</td>
+                <td>${formatDate(user.createdAt)}</td>
+                <td>${actions || "-"}</td>
+            </tr>
+        `;
+    });
+}
+
+function updateUserRole(userId, nextRole) {
+    apiFetch(`/api/admin/users/${userId}/role`, {
+        method: "PUT",
+        body: JSON.stringify({ role: nextRole })
+    })
+        .then(() => {
+            showToast("User role updated", "success");
+            loadUsers();
+        })
+        .catch(err => showToast(err.message, "error"));
+}
+
+function deleteUser(userId) {
+    if (!confirm("Delete this account? Its messages and appointments will also be deleted.")) {
+        return;
+    }
+
+    apiFetch(`/api/admin/users/${userId}`, { method: "DELETE" })
+        .then(() => {
+            showToast("User deleted", "success");
+            loadUsers();
+        })
+        .catch(err => showToast(err.message, "error"));
+}
+
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
 
 // LOAD MESSAGES
 function loadMessages() {

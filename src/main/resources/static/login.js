@@ -18,7 +18,9 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
 
         setTimeout(() => {
             window.location.href =
-                data.role === "ROLE_ADMIN" ? "admin.html" : "message.html";
+                data.role === "ROLE_ADMIN" || data.role === "ROLE_SUPER_ADMIN"
+                    ? "admin.html"
+                    : "message.html";
         }, 1000);
 
     } catch (err) {

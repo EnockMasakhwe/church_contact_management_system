@@ -18,6 +18,7 @@ import com.eliarojr.contact_form.service.AuthService;
 import com.eliarojr.contact_form.service.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,9 @@ public class AuthServiceImpl implements AuthService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Value("${app.super-admin-email}")
+    private String superAdminEmail;
 
     @Override
     public String register(RegisterRequest request) {
@@ -115,7 +119,9 @@ public class AuthServiceImpl implements AuthService {
         AuthResponse response = new AuthResponse();
         response.setUsername(user.getUsername());
         response.setToken(token);
-        response.setRole(user.getRole());
+        response.setRole(user.getEmail().equalsIgnoreCase(superAdminEmail)
+                ? Role.ROLE_SUPER_ADMIN
+                : user.getRole());
 
         return response;
     }

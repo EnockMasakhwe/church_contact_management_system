@@ -2,7 +2,7 @@ package com.eliarojr.contact_form.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -10,8 +10,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
+    private final String fromAddress;
+    private final String applicationBaseUrl;
+
+    public EmailService(
+            JavaMailSender mailSender,
+            @Value("${spring.mail.username}") String fromAddress,
+            @Value("${app.base-url}") String applicationBaseUrl) {
+        this.mailSender = mailSender;
+        this.fromAddress = fromAddress;
+        this.applicationBaseUrl = applicationBaseUrl.replaceAll("/+$", "");
+    }
 
     public void sendEmail(String toEmail, String subject, String htmlBody) {
 
@@ -20,6 +30,7 @@ public class EmailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+            helper.setFrom(fromAddress);
             helper.setTo(toEmail);
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
@@ -34,7 +45,7 @@ public class EmailService {
     //EMAIL VERIFICATION (BACKEND DIRECT)
     public void sendVerificationEmail(String toEmail, String token) {
 
-        String verifyLink = "http://localhost:8080/api/auth/verify?token=" + token;
+        String verifyLink = applicationBaseUrl + "/api/auth/verify?token=" + token;
 
         String html = """
         <div style="font-family: Arial; padding: 20px;">
@@ -64,7 +75,7 @@ public class EmailService {
     //RESET PASSWORD (FRONTEND PAGE)
     public void sendPasswordResetEmail(String toEmail, String token) {
 
-        String resetLink = "http://localhost:8080/reset-password.html?token=" + token;
+        String resetLink = applicationBaseUrl + "/reset-password.html?token=" + token;
 
         String html = """
         <div style="font-family: Arial; padding: 20px;">
