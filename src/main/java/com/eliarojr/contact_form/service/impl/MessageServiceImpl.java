@@ -3,11 +3,12 @@ package com.eliarojr.contact_form.service.impl;
 import com.eliarojr.contact_form.dto.MessageRequest;
 import com.eliarojr.contact_form.dto.MessageResponse;
 import com.eliarojr.contact_form.entity.Appointment;
-import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
 import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.entity.enums.MessageType;
+import com.eliarojr.contact_form.entity.enums.Role;
+import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.exception.BadRequestException;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.exception.UnauthorizedException;
@@ -20,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,9 @@ public class MessageServiceImpl implements MessageService {
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+
+    @Value("${app.super-admin-email}")
+    private String superAdminEmail;
 
     private final Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
 
@@ -95,9 +100,7 @@ public class MessageServiceImpl implements MessageService {
 
         Message saved = messageRepository.save(message);
 
-        // Notify admin
-        String adminEmail = "enockmasakhwe@gmail.com";
-
+        // Notify all admins, including the configured superadmin.
         String subject = "New Message Received";
 
         String body = """
@@ -113,7 +116,9 @@ public class MessageServiceImpl implements MessageService {
                 request.getMessage()
         );
 
-        emailService.sendEmail(adminEmail, subject, body);
+        List<Role> adminRoles = List.of(Role.ROLE_ADMIN, Role.ROLE_SUPER_ADMIN);
+        userRepository.findAdminRecipients(adminRoles, superAdminEmail)
+                .forEach(admin -> emailService.sendEmail(admin.getEmail(), subject, body));
 
         //CREATE APPOINTMENT
         if (type == MessageType.VISITATION_REQUEST) {
