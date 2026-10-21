@@ -74,7 +74,7 @@ function submitForm(event) {
             loadCalendar();
         })
         .catch(err => {
-            if (err.message.toLowerCase().includes("unauthorized")) {
+            if (err.status === 401) {
                 showToast("Session expired", "error");
                 setTimeout(logout, 1500);
             } else {
@@ -89,7 +89,7 @@ async function loadCalendar() {
         const data = await apiFetch("/api/appointments/public");
         renderCalendar(data);
     } catch (err) {
-        showToast("Failed to load calendar", "error");
+        showToast(err.message, "error");
     }
 }
 

@@ -17,6 +17,6 @@ document.getElementById("registerForm").addEventListener("submit", async e => {
         setTimeout(() => window.location.href = "login.html", 1500);
 
     } catch (err) {
-        console.error(err);
+        showToast(err.message, "error");
     }
 });

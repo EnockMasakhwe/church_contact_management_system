@@ -1,12 +1,14 @@
 package com.eliarojr.contact_form.dto;
 
-import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class ResetPasswordRequest {
-    @Column(nullable = false)
+
+    @NotBlank(message = "Reset token is required")
     private String token;
-    @Column(nullable = false)
+
+    @NotBlank(message = "New password is required")
     private String newPassword;
 }

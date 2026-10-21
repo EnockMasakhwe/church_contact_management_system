@@ -1,10 +1,13 @@
 package com.eliarojr.contact_form.config;
 
+import com.eliarojr.contact_form.dto.ErrorResponse;
 import com.eliarojr.contact_form.security.JwtAuthenticationFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +19,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 @Configuration
 @EnableMethodSecurity
@@ -43,7 +50,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -73,8 +80,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         http
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(authenticationEntryPoint())
-                        .accessDeniedHandler(accessDeniedHandler())
+                        .authenticationEntryPoint(authenticationEntryPoint(objectMapper))
+                        .accessDeniedHandler(accessDeniedHandler(objectMapper))
                 );
 
         return http.build();
@@ -82,30 +89,29 @@ public class SecurityConfig {
 
     //Spring security exception handling
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
+    public AuthenticationEntryPoint authenticationEntryPoint(ObjectMapper objectMapper) {
         return (request, response, authException) -> {
-            response.setContentType("application/json");
-            response.setStatus(401);
-            response.getWriter().write("""
-        {
-            "message": "Unauthorized - please login",
-            "status": 401
-        }
-        """);
+            writeErrorResponse(objectMapper, response, 401, "Unauthorized - please login.");
         };
     }
 
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
+    public AccessDeniedHandler accessDeniedHandler(ObjectMapper objectMapper) {
         return (request, response, ex) -> {
-            response.setContentType("application/json");
-            response.setStatus(403);
-            response.getWriter().write("""
-        {
-            "message": "Access denied",
-            "status": 403
-        }
-        """);
+            writeErrorResponse(objectMapper, response, 403, "Access denied.");
         };
+    }
+
+    private void writeErrorResponse(
+            ObjectMapper objectMapper,
+            jakarta.servlet.http.HttpServletResponse response,
+            int status,
+            String message
+    ) throws IOException {
+        response.setStatus(status);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        objectMapper.writeValue(response.getOutputStream(),
+                new ErrorResponse(message, status, LocalDateTime.now()));
     }
 }

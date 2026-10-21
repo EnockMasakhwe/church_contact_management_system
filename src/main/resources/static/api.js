@@ -14,29 +14,51 @@ function showToast(message, type = "error") {
 
 // Handle response
 async function handleResponse(res) {
-    let data;
     const contentType = res.headers.get("content-type") || "";
+    const isJson = contentType.toLowerCase().includes("json");
+    let body;
 
-    if (contentType.includes("application/json")) {
-        try {
-            data = await res.json();
-        } catch {
-            throw new Error("Invalid JSON response from server");
+    try {
+        body = await res.text();
+    } catch {
+        throw new ApiError("Could not read the server response. Please try again.", res.status);
+    }
+
+    let data = null;
+    if (body) {
+        if (isJson) {
+            try {
+                data = JSON.parse(body);
+            } catch {
+                if (res.ok) {
+                    throw new ApiError("Server returned an invalid response.", res.status);
+                }
+            }
+        } else if (contentType.toLowerCase().includes("text/plain")) {
+            data = body;
         }
-    } else {
-        data = await res.text();
     }
 
     if (!res.ok) {
-        const message =
-            typeof data === "object" && data !== null
-                ? data.message || data.error || "Request failed"
-                : data || `Request failed (${res.status})`;
+        const responseMessage = typeof data === "object" && data !== null
+            ? data.message || data.error
+            : typeof data === "string" ? data.trim() : "";
+        const message = typeof responseMessage === "string" && responseMessage.trim()
+            ? responseMessage.trim()
+            : `Request failed (${res.status}).`;
 
-        throw new Error(message);
+        throw new ApiError(message, res.status);
     }
 
     return data;
+}
+
+class ApiError extends Error {
+    constructor(message, status = null) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+    }
 }
 
 // Main fetch wrapper
@@ -55,15 +77,20 @@ async function apiFetch(url, options = {}) {
         }
     };
 
+    let res;
     try {
-        const res = await fetch(requestUrl, config);
-        if (res.status === 401) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("role");
-        }
-        return await handleResponse(res);
+        res = await fetch(requestUrl, config);
     } catch (err) {
-        showToast(err.message);
-        throw err;
+        if (err && err.name === "AbortError") {
+            throw new ApiError("Request was cancelled.");
+        }
+        throw new ApiError("Unable to reach the server. Check your connection and try again.");
     }
+
+    if (res.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+    }
+
+    return handleResponse(res);
 }

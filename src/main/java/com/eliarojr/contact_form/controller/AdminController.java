@@ -66,7 +66,10 @@ public class AdminController {
     }
 
     @PutMapping("/messages/{id}/status")
-    public ResponseEntity<MessageResponse> updateStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
+    public ResponseEntity<MessageResponse> updateStatus(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateStatusRequest request
+    ) {
         return ResponseEntity.ok(adminService.updateStatus(id, request.getStatus()));
     }
 

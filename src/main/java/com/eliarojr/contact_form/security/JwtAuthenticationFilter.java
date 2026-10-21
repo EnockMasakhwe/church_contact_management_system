@@ -1,12 +1,16 @@
 package com.eliarojr.contact_form.security;
 
+import com.eliarojr.contact_form.dto.ErrorResponse;
 import com.eliarojr.contact_form.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import io.jsonwebtoken.JwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -43,8 +49,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-
             final String jwt = authHeader.substring(7);
+            if (jwt.isBlank()) {
+                writeUnauthorized(response);
+                return;
+            }
             final String userEmail = jwtService.extractUsername(jwt);
 
             if (userEmail != null &&
@@ -72,12 +81,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
 
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid JWT token");
+        } catch (JwtException | UsernameNotFoundException e) {
+            SecurityContextHolder.clearContext();
+            writeUnauthorized(response);
             return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void writeUnauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        objectMapper.writeValue(response.getOutputStream(),
+                new ErrorResponse("Invalid or expired token.", HttpServletResponse.SC_UNAUTHORIZED, LocalDateTime.now()));
     }
 }

@@ -7,6 +7,8 @@ if (!token) {
 
 // load
 document.addEventListener("DOMContentLoaded", () => {
+    if (!token) return;
+
     loadMyMessages();
     loadMyAppointments();
 });
@@ -16,13 +18,12 @@ async function loadMyMessages() {
         const messages = await apiFetch("/api/user/messages");
         displayMyMessages(messages);
     } catch (err) {
-        // Check if it's an auth error
-        if (err.message === "Unauthorized" || err.message.includes("401") || err.message.includes("403")) {
+        if (err.status === 401) {
             showToast("Session expired", "error");
             setTimeout(logout, 1500);
+        } else {
+            showToast(err.message, "error");
         }
-        // Toast is already shown by apiFetch, but you can add custom handling here
-        console.error(err);
     }
 }
 
@@ -50,12 +51,12 @@ async function loadMyAppointments() {
         const appointments = await apiFetch("/api/user/appointments");
         displayMyAppointments(appointments);
     } catch (err) {
-        // Check if it's an auth error
-        if (err.message === "Unauthorized" || err.message.includes("401") || err.message.includes("403")) {
+        if (err.status === 401) {
             showToast("Session expired", "error");
             setTimeout(logout, 1500);
+        } else {
+            showToast(err.message, "error");
         }
-        console.error(err);
     }
 }
 
