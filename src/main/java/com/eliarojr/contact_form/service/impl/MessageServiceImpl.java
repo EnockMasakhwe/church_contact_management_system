@@ -92,8 +92,6 @@ public class MessageServiceImpl implements MessageService {
         message.setMessage(request.getMessage());
         message.setType(type);
         message.setStatus(MessageStatus.NEW);
-        message.setCreatedAt(LocalDateTime.now());
-
         message.setLocation(request.getLocation());
         message.setPreferredDateTime(request.getPreferredDateTime());
         message.setPhone(request.getPhone());

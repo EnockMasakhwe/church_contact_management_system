@@ -5,42 +5,47 @@ import com.eliarojr.contact_form.entity.enums.MessageType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "contact_messages")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 13)
     private String phone;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 32)
     private MessageType type;
 
+    @Column(nullable = false, length = 1000)
     private String message;
 
-    private String location; // optional
-
-    private LocalDateTime preferredDateTime; // optional
+    //Only required when booking an appointment and unnecessary for other message types
+    private String location;
+    private LocalDateTime preferredDateTime;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 32)
     private MessageStatus status;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate(){
-        createdAt = LocalDateTime.now();
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
 
     @OneToMany(mappedBy = "message", cascade = CascadeType.ALL)
