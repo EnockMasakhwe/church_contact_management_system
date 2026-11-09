@@ -6,6 +6,7 @@ import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
 import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +60,8 @@ public class AppointmentService {
     }
 
     //Update status
-    public Appointment updateStatus(Long id, AppointmentStatus status) {
+    @Transactional
+    public AppointmentResponse updateStatus(Long id, AppointmentStatus status) {
 
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
@@ -70,18 +72,18 @@ public class AppointmentService {
         if (appointment.getMessage() != null) {
             switch (status) {
                 case APPROVED -> appointment.getMessage().setStatus(MessageStatus.IN_PROGRESS);
-                case COMPLETED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
-                case REJECTED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
+                case COMPLETED, REJECTED -> appointment.getMessage().setStatus(MessageStatus.CLOSED);
+                case PENDING -> appointment.getMessage().setStatus(MessageStatus.READ);
             }
         }
 
-        Appointment saved = appointmentRepository.save(appointment);
+        AppointmentResponse response = mapToResponse(appointment);
 
         //Send email AFTER save
-        if (saved.getMessage() != null && saved.getMessage().getUser() != null) {
+        if (appointment.getMessage() != null && appointment.getMessage().getUser() != null) {
 
-            String userEmail = saved.getMessage().getUser().getEmail();
-            String username = saved.getMessage().getUser().getUsername();
+            String userEmail = appointment.getMessage().getUser().getEmail();
+            String username = appointment.getMessage().getUser().getUsername();
 
             String subject;
             String body;
@@ -108,6 +110,18 @@ public class AppointmentService {
             emailService.sendEmail(userEmail, subject, body);
         }
 
-        return saved;
+        return response;
+    }
+
+    private AppointmentResponse mapToResponse(Appointment appointment) {
+        return new AppointmentResponse(
+                appointment.getId(),
+                appointment.getStartTime(),
+                appointment.getEndTime(),
+                appointment.getStatus().name(),
+                appointment.getMessage().getUser().getUsername(),
+                appointment.getMessage().getUser().getEmail(),
+                appointment.getMessage().getMessage()
+        );
     }
 }

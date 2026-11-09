@@ -29,7 +29,7 @@ public class AppointmentController {
 
     // UPDATE STATUS (ADMIN)
     @PutMapping("/api/admin/appointments/{id}/status")
-    public Appointment updateStatus(
+    public AppointmentResponse updateStatus(
             @PathVariable Long id,
             @RequestParam AppointmentStatus status
     ) {

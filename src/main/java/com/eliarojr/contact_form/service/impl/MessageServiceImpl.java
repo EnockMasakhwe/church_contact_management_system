@@ -75,8 +75,11 @@ public class MessageServiceImpl implements MessageService {
             LocalDateTime end = start.plusHours(1);
 
             List<Appointment> conflicts =
-                    appointmentRepository.findConflictingAppointments(start, end);
-
+                    appointmentRepository.findConflictingAppointments(
+                            start,
+                            end,
+                            List.of(AppointmentStatus.PENDING, AppointmentStatus.APPROVED)
+                    );
             if (!conflicts.isEmpty()) {
                 throw new BadRequestException("Selected time slot already booked");
             }
