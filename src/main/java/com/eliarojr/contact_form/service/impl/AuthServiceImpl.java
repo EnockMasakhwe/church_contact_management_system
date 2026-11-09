@@ -116,14 +116,13 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtService.generateToken(user.getEmail());
 
         //Build response
-        AuthResponse response = new AuthResponse();
-        response.setUsername(user.getUsername());
-        response.setToken(token);
-        response.setRole(user.getEmail().equalsIgnoreCase(superAdminEmail)
-                ? Role.ROLE_SUPER_ADMIN
-                : user.getRole());
-
-        return response;
+        return new AuthResponse(
+                user.getUsername(),
+                token,
+                user.getEmail().equalsIgnoreCase(superAdminEmail)
+                        ? Role.ROLE_SUPER_ADMIN
+                        : user.getRole()
+        );
     }
 
     @Override
