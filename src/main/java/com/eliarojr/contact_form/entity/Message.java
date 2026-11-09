@@ -31,6 +31,7 @@ public class Message {
     private String message;
 
     //Only required when booking an appointment and unnecessary for other message types
+    @Column(length = 255)
     private String location;
     private LocalDateTime preferredDateTime;
 

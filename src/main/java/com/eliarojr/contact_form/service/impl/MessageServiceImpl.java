@@ -19,6 +19,7 @@ import com.eliarojr.contact_form.service.EmailService;
 import com.eliarojr.contact_form.service.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,8 +46,6 @@ public class MessageServiceImpl implements MessageService {
     @Value("${app.super-admin-email}")
     private String superAdminEmail;
 
-    private final Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
-
     @Transactional
     @Override
     public MessageResponse sendMessage(MessageRequest request) {
@@ -61,10 +60,8 @@ public class MessageServiceImpl implements MessageService {
         User user = Optional.ofNullable(userRepository.findByEmail(email))
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
 
-        MessageType type = MessageType.valueOf(String.valueOf(request.getType()));
-
         //VALIDATION
-        if (type == MessageType.VISITATION_REQUEST) {
+        if (request.getType() == MessageType.VISITATION_REQUEST) {
 
             if (isBlank(request.getLocation())) {
                 throw new BadRequestException("Location required");
@@ -90,13 +87,28 @@ public class MessageServiceImpl implements MessageService {
 
         message.setUser(user); //KEY
         message.setMessage(request.getMessage());
-        message.setType(type);
+        message.setType(request.getType());
         message.setStatus(MessageStatus.NEW);
         message.setLocation(request.getLocation());
         message.setPreferredDateTime(request.getPreferredDateTime());
         message.setPhone(request.getPhone());
 
         Message saved = messageRepository.save(message);
+
+
+        //CREATE APPOINTMENT
+        if (request.getType() == MessageType.VISITATION_REQUEST) {
+
+            LocalDateTime start = request.getPreferredDateTime();
+
+            Appointment appointment = new Appointment();
+            appointment.setStartTime(start);
+            appointment.setEndTime(start.plusHours(1));
+            appointment.setStatus(AppointmentStatus.PENDING);
+            appointment.setMessage(saved);
+
+            appointmentRepository.save(appointment);
+        }
 
         // Notify all admins, including the configured superadmin.
         String subject = "New Message Received";
@@ -110,27 +122,13 @@ public class MessageServiceImpl implements MessageService {
         """.formatted(
                 user.getUsername(),
                 user.getEmail(),
-                type.name(),
+                request.getType().name(),
                 request.getMessage()
         );
 
         List<Role> adminRoles = List.of(Role.ROLE_ADMIN, Role.ROLE_SUPER_ADMIN);
         userRepository.findAdminRecipients(adminRoles, superAdminEmail)
                 .forEach(admin -> emailService.sendEmail(admin.getEmail(), subject, body));
-
-        //CREATE APPOINTMENT
-        if (type == MessageType.VISITATION_REQUEST) {
-
-            LocalDateTime start = request.getPreferredDateTime();
-
-            Appointment appointment = new Appointment();
-            appointment.setStartTime(start);
-            appointment.setEndTime(start.plusHours(1));
-            appointment.setStatus(AppointmentStatus.PENDING);
-            appointment.setMessage(saved);
-
-            appointmentRepository.save(appointment);
-        }
 
         //Response
         return mapToResponse(saved);
