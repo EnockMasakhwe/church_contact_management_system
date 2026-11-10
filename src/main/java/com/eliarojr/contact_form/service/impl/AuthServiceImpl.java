@@ -77,6 +77,7 @@ public class AuthServiceImpl implements AuthService {
         return ("User registered successfully. Please verify your email.");
     }
 
+    @Override
     public String verifyUser(String token) {
 
         VerificationToken verificationToken = verificationTokenRepository

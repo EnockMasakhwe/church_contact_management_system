@@ -4,6 +4,7 @@ import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,6 +28,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
+        }
+        if (!user.isEnabled()) {
+            throw new DisabledException("Account is disabled");
         }
 
         String authority = user.getEmail().equalsIgnoreCase(superAdminEmail)
