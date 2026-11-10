@@ -4,16 +4,14 @@ import com.eliarojr.contact_form.entity.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class User {
 
@@ -22,19 +20,24 @@ public class User {
     private Long id;
 
     @NotBlank(message = "Username is required")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 254)
     private String username;
+
     @NotBlank(message = "Email is required")
     @Email
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 254)
     private String email;
+
     @NotBlank(message = "Password is required")
     @Column(nullable = false)
     private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
     private LocalDateTime createdAt;
+    @Column(nullable = false)
     private boolean enabled = false;
 
     @PrePersist
