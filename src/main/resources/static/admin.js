@@ -41,7 +41,7 @@ function displayUsers(users) {
             actions += `<button class="action-btn progress-btn" onclick="updateUserRole(${user.id}, '${nextRole}')">${actionLabel}</button>`;
         }
 
-        if (!isProtectedSuperAdmin) {
+        if (isSuperAdmin && !isProtectedSuperAdmin) {
             actions += `<button class="action-btn delete-btn" onclick="deleteUser(${user.id})">Delete</button>`;
         }
 
