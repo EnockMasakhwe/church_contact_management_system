@@ -57,7 +57,7 @@ public class MessageServiceImpl implements MessageService {
                 .getPrincipal())
                 .getUsername();
 
-        User user = Optional.ofNullable(userRepository.findByEmail(email))
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         //VALIDATION

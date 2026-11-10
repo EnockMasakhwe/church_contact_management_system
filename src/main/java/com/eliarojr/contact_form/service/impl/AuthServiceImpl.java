@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        User user = Optional.ofNullable(userRepository.findByEmail(request.getEmail()))
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
         if (!user.isEnabled()) {
@@ -133,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void createPasswordResetToken(String email) {
 
-        User user = Optional.ofNullable(userRepository.findByEmail(email))
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = UUID.randomUUID().toString();

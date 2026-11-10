@@ -2,7 +2,7 @@ package com.eliarojr.contact_form.service.impl;
 
 import com.eliarojr.contact_form.dto.AppointmentResponse;
 import com.eliarojr.contact_form.dto.MessageResponse;
-import com.eliarojr.contact_form.exception.ResourceNotFoundException;
+import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.exception.UnauthorizedException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.MessageRepository;
@@ -31,9 +31,9 @@ public class UserServiceImpl implements UserService {
                 .getPrincipal())
                 .getUsername();
 
-        return Optional.ofNullable(userRepository.findByEmail(email))
-                .orElseThrow(() -> new UnauthorizedException("User not found"))
-                .getId();
+        return userRepository.findByEmail(email)
+                .map(User::getId)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
     }
 
     @Override
