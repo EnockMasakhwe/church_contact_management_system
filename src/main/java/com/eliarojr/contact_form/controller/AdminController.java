@@ -5,7 +5,6 @@ import com.eliarojr.contact_form.dto.AdminUserResponse;
 import com.eliarojr.contact_form.dto.MessageResponse;
 import com.eliarojr.contact_form.dto.UpdateUserRoleRequest;
 import com.eliarojr.contact_form.dto.UpdateStatusRequest;
-import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.service.AdminService;
 import com.eliarojr.contact_form.service.AdminStatsService;
 import com.eliarojr.contact_form.service.AdminUserService;
@@ -42,6 +41,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         adminUserService.deleteUser(id);
         return ResponseEntity.ok("User deleted successfully");
@@ -53,9 +53,9 @@ public class AdminController {
     }
 
     @DeleteMapping("/messages/{id}")
-    public ResponseEntity<String> deleteMessage(@PathVariable Long id) {
+    public ResponseEntity.HeadersBuilder<?> deleteMessage(@PathVariable Long id) {
         adminService.deleteMessage(id);
-        return ResponseEntity.ok("Message deleted successfully");
+        return ResponseEntity.noContent();
     }
 
     @PutMapping("/messages/{id}/status")

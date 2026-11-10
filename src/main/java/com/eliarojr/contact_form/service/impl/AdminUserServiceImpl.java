@@ -13,6 +13,9 @@ import com.eliarojr.contact_form.service.AdminUserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,6 +58,13 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public void deleteUser(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || !authentication.getName().equalsIgnoreCase(superAdminEmail)) {
+            throw new AccessDeniedException("Only the superadmin can delete user accounts");
+        }
+
         User user = findUser(userId);
         if (isSuperAdmin(user)) {
             throw new BadRequestException("The superadmin account cannot be deleted");
