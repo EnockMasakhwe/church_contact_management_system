@@ -7,6 +7,7 @@ import com.eliarojr.contact_form.entity.PasswordResetToken;
 import com.eliarojr.contact_form.entity.enums.Role;
 import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.entity.VerificationToken;
+import com.eliarojr.contact_form.event.AuthEmailEvent;
 import com.eliarojr.contact_form.exception.BadRequestException;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.exception.UnauthorizedException;
@@ -15,10 +16,10 @@ import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.repository.VerificationTokenRepository;
 import com.eliarojr.contact_form.service.JwtService;
 import com.eliarojr.contact_form.service.AuthService;
-import com.eliarojr.contact_form.service.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +36,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final VerificationTokenRepository verificationTokenRepository;
-    private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${app.super-admin-email}")
     private String superAdminEmail;
@@ -71,8 +72,11 @@ public class AuthServiceImpl implements AuthService {
 
         verificationTokenRepository.save(verificationToken);
 
-        // 📧 Send email
-        emailService.sendVerificationEmail(user.getEmail(), token);
+        eventPublisher.publishEvent(new AuthEmailEvent(
+                user.getEmail(),
+                token,
+                AuthEmailEvent.Type.VERIFICATION
+        ));
 
         return ("User registered successfully. Please verify your email.");
     }
@@ -143,7 +147,11 @@ public class AuthServiceImpl implements AuthService {
 
         passwordResetTokenRepository.save(resetToken);
 
-        emailService.sendPasswordResetEmail(user.getEmail(), token);
+        eventPublisher.publishEvent(new AuthEmailEvent(
+                user.getEmail(),
+                token,
+                AuthEmailEvent.Type.PASSWORD_RESET
+        ));
     }
 
     @Override
