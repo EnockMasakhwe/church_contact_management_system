@@ -83,6 +83,14 @@ function formatDate(date) {
     return date ? new Date(date).toLocaleString() : "-";
 }
 
+function goToDashboard() {
+    window.location.href = "user.html";
+}
+
+function goToMessages() {
+    window.location.href = "message.html";
+}
+
 function logout() {
     localStorage.clear();
     window.location.href = "login.html";
