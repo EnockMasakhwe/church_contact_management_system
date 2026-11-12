@@ -1,93 +1,18 @@
-/* Layout */
 .main-layout {
-    display: flex;
-    justify-content: center;
     align-items: flex-start;
-    gap: 30px;
-    padding: 30px;
-    flex-wrap: wrap;
 }
 
-/* Form */
 .form-container {
-    width: 380px;
-    background: #fff;
-    padding: 25px;
-    border-radius: 10px;
-    border: 1px solid #e0e6ed;
+    box-shadow: var(--shadow);
 }
 
-/* Calendar */
 .calendar-container {
-    width: 650px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    border: 1px solid #e0e6ed;
+    box-shadow: var(--shadow);
 }
 
-/* Calendar grid */
-#calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-}
-
-/* Day */
-.day-column {
-    border: 1px solid #e0e6ed;
-    padding: 8px;
-    border-radius: 6px;
-    background: #f9fbfd;
-}
-
-/* Header */
-.day-header {
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 8px;
-    font-size: 12px;
-    color: #2c3e50;
-}
-
-/* Slots */
-.time-slot {
-    padding: 6px;
-    margin: 4px 0;
-    text-align: center;
-    border-radius: 5px;
-    cursor: pointer;
-    background: #eef3f8;
-    font-size: 12px;
-}
-
-/* Booked */
-.time-slot.booked {
-    background: #e74c3c;
-    color: white;
-    cursor: not-allowed;
-}
-
-/* Selected */
-.time-slot.selected {
-    background: #2d7dd2;
-    color: white;
-}
-
-/* Past */
-.time-slot.past {
-    background: #bdc3c7;
-    cursor: not-allowed;
-}
-
-/* Responsive */
 @media (max-width: 900px) {
     .main-layout {
         flex-direction: column;
-        align-items: center;
-    }
-
-    .calendar-container {
-        width: 100%;
+        align-items: stretch;
     }
 }
