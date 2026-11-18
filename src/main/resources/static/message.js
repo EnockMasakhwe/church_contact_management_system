@@ -64,13 +64,7 @@ function submitForm(event) {
     })
         .then(() => {
             showToast("Message sent successfully", "success");
-            document.getElementById("contactForm").reset();
-
-            if (selectedSlot) {
-                selectedSlot.classList.remove("selected");
-                selectedSlot = null;
-            }
-
+            resetContactForm();
             loadCalendar();
         })
         .catch(err => {
@@ -81,6 +75,18 @@ function submitForm(event) {
                 showToast(err.message, "error");
             }
         });
+}
+
+function resetContactForm() {
+    document.getElementById("contactForm").reset();
+    document.getElementById("location").style.display = "none";
+    document.getElementById("calendarSection").style.display = "none";
+    document.getElementById("preferredDateTime").value = "";
+
+    if (selectedSlot) {
+        selectedSlot.classList.remove("selected");
+        selectedSlot = null;
+    }
 }
 
 // calendar
@@ -176,6 +182,10 @@ document.addEventListener("DOMContentLoaded", loadCalendar);
 // nav
 function goToDashboard() {
     window.location.href = "user.html";
+}
+
+function goToMessages() {
+    window.location.href = "message.html";
 }
 
 // logout
