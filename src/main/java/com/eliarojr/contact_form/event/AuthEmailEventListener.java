@@ -2,6 +2,7 @@ package com.eliarojr.contact_form.event;
 
 import com.eliarojr.contact_form.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -12,6 +13,7 @@ public class AuthEmailEventListener {
 
     private final EmailService emailService;
 
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendAuthEmail(AuthEmailEvent event) {
         switch (event.type()) {

@@ -30,7 +30,7 @@ The application provides a digital channel for initiating contact and coordinati
 
 ## How it works
 
-1. A member registers with a username, email address, and password. Registration sends a verification link; the account must be verified before sign-in.
+1. A member registers with a username, email address, and password. The confirmation screen tells them to check their email. The account must be verified before sign-in; the login page can resend an expired or missing verification link. Verification resend and password-reset requests are limited to one email per account every two minutes. Password-reset requests use the same confirmation for registered and unregistered email addresses.
 2. A signed-in member submits a message. The message is associated with their account and appears in their dashboard.
 3. For a visitation request, the member also provides a location and selects a preferred time. The server checks for an overlapping appointment and creates a pending appointment.
 4. Administrators review submissions in the admin dashboard, update message or appointment statuses, and manage accounts. Super-administrators can also change account roles.

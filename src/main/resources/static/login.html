@@ -34,12 +34,19 @@
     </form>
 
     <p class="auth-links">Don't have an account? <a href="register.html">Sign Up</a><br>
-        Forgot your password? <a href="javascript:void(0)" onclick="toggleForgotPassword()">Reset</a></p>
+        Forgot your password? <a href="javascript:void(0)" onclick="toggleForgotPassword()">Reset</a><br>
+        Didn't receive a verification email? <a href="javascript:void(0)" onclick="toggleResendVerification()">Resend</a></p>
 
     <div id="forgotPasswordBox" style="display:none;">
         <label for="forgotEmail">Email Address</label>
         <input type="email" id="forgotEmail" autocomplete="email" placeholder="Enter your email">
-        <button class="primary-btn" onclick="sendResetLink()">Send Reset Link</button>
+        <button type="button" class="primary-btn" onclick="sendResetLink()">Send Reset Link</button>
+    </div>
+
+    <div id="resendVerificationBox" style="display:none;">
+        <label for="verificationEmail">Email Address</label>
+        <input type="email" id="verificationEmail" autocomplete="email" placeholder="Enter your email">
+        <button type="button" class="primary-btn" onclick="resendVerificationEmail()">Resend Verification Email</button>
         <p id="forgotMsg"></p>
     </div>
 </div>

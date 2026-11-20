@@ -31,6 +31,13 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
 // toggle forgot password
 function toggleForgotPassword() {
     const box = document.getElementById("forgotPasswordBox");
+    document.getElementById("resendVerificationBox").style.display = "none";
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+function toggleResendVerification() {
+    const box = document.getElementById("resendVerificationBox");
+    document.getElementById("forgotPasswordBox").style.display = "none";
     box.style.display = box.style.display === "none" ? "block" : "none";
 }
 
@@ -38,8 +45,8 @@ function toggleForgotPassword() {
 async function sendResetLink() {
     const email = document.getElementById("forgotEmail").value;
 
-    if (!email) {
-        showToast("Enter your email", "error");
+    if (!email.trim()) {
+        showToast("Enter your email", "warning");
         return;
     }
 
@@ -51,6 +58,24 @@ async function sendResetLink() {
 
         showToast(msg || "Reset link sent", "success");
 
+    } catch (err) {
+        showToast(err.message, "error");
+    }
+}
+
+async function resendVerificationEmail() {
+    const email = document.getElementById("verificationEmail").value;
+    if (!email.trim()) {
+        showToast("Enter your email", "warning");
+        return;
+    }
+
+    try {
+        const message = await apiFetch("/api/auth/resend-verification", {
+            method: "POST",
+            body: JSON.stringify({ email })
+        });
+        showToast(message, "success");
     } catch (err) {
         showToast(err.message, "error");
     }

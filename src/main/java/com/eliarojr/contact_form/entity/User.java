@@ -37,6 +37,7 @@ public class User {
     private Role role;
 
     private LocalDateTime createdAt;
+    private LocalDateTime passwordResetRequestedAt;
     @Column(nullable = false)
     private boolean enabled = false;
 

@@ -9,7 +9,6 @@ import com.eliarojr.contact_form.entity.User;
 import com.eliarojr.contact_form.entity.VerificationToken;
 import com.eliarojr.contact_form.event.AuthEmailEvent;
 import com.eliarojr.contact_form.exception.BadRequestException;
-import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.exception.UnauthorizedException;
 import com.eliarojr.contact_form.repository.PasswordResetTokenRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
@@ -24,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,13 +44,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())){
+        String email = normalizeEmail(request.getEmail());
+        if (userRepository.existsByEmailIgnoreCase(email)){
             throw new BadRequestException("Email already exists");
         }
 
         User user =  new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
+        user.setUsername(request.getUsername().trim());
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.ROLE_USER);
         user.setCreatedAt(LocalDateTime.now());
@@ -104,8 +105,40 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public void resendVerificationEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmailForUpdate(normalizeEmail(email));
+        if (optionalUser.isEmpty() || optionalUser.get().isEnabled()) {
+            return;
+        }
+
+        User user = optionalUser.get();
+        LocalDateTime now = LocalDateTime.now();
+        Optional<VerificationToken> existing = verificationTokenRepository.findByUser(user);
+        if (existing.isPresent()) {
+            VerificationToken token = existing.get();
+            if (token.getCreatedAt() != null && token.getCreatedAt().isAfter(now.minusMinutes(2))) {
+                return;
+            }
+            verificationTokenRepository.delete(token);
+        }
+
+        String token = UUID.randomUUID().toString();
+        verificationTokenRepository.save(VerificationToken.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(now.plusHours(24))
+                .createdAt(now)
+                .build());
+        eventPublisher.publishEvent(new AuthEmailEvent(
+                user.getEmail(),
+                token,
+                AuthEmailEvent.Type.VERIFICATION
+        ));
+    }
+
+    @Override
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmailIgnoreCase(normalizeEmail(request.getEmail()))
                 .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
         if (!user.isEnabled()) {
@@ -133,8 +166,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void createPasswordResetToken(String email) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Optional<User> optionalUser = userRepository.findByEmailForUpdate(normalizeEmail(email));
+        if (optionalUser.isEmpty()) {
+            return;
+        }
+        User user = optionalUser.get();
+        LocalDateTime now = LocalDateTime.now();
+        if (user.getPasswordResetRequestedAt() != null
+                && user.getPasswordResetRequestedAt().isAfter(now.minusMinutes(2))) {
+            return;
+        }
 
         String token = UUID.randomUUID().toString();
 
@@ -143,9 +184,12 @@ public class AuthServiceImpl implements AuthService {
         PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(token);
         resetToken.setUser(user);
-        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
+        resetToken.setExpiryDate(now.plusMinutes(30));
+        resetToken.setCreatedAt(now);
 
         passwordResetTokenRepository.save(resetToken);
+        user.setPasswordResetRequestedAt(now);
+        userRepository.save(user);
 
         eventPublisher.publishEvent(new AuthEmailEvent(
                 user.getEmail(),
@@ -166,9 +210,14 @@ public class AuthServiceImpl implements AuthService {
 
         User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordResetRequestedAt(null);
 
         userRepository.save(user);
 
         passwordResetTokenRepository.delete(resetToken);
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 }

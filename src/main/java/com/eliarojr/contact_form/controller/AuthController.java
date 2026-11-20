@@ -30,6 +30,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/resend-verification")
+    public ResponseEntity<String> resendVerification(@RequestBody @Valid ForgotPasswordRequest request) {
+        authService.resendVerificationEmail(request.getEmail());
+        return ResponseEntity.ok("If your account needs verification, check your inbox shortly. Wait two minutes between requests.");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
         AuthResponse response = authService.login(request);
@@ -39,7 +45,7 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
         authService.createPasswordResetToken(request.getEmail());
-        return ResponseEntity.ok("Password reset link sent to email");
+        return ResponseEntity.ok("If an account exists for that email, a password reset link will be sent.");
     }
 
     @PostMapping("/reset-password")
