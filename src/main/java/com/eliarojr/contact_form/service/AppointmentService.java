@@ -7,12 +7,18 @@ import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.exception.BadRequestException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
+import com.eliarojr.contact_form.repository.UserRepository;
+import com.eliarojr.contact_form.entity.enums.Role;
+import com.eliarojr.contact_form.event.NotificationEmailEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +28,11 @@ import java.util.List;
 public class AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
-    private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
+
+    @Value("${app.super-admin-email}")
+    private String superAdminEmail;
 
     //Admin view
     public List<AppointmentResponse> getAllAppointments() {
@@ -121,20 +131,27 @@ public class AppointmentService {
             switch (status) {
                 case APPROVED -> {
                     subject = "Appointment Approved";
-                    body = "<h3>Hello " + username + ",</h3><p>Your appointment has been approved.</p>";
+                    body = "<h3>Hello " + escapeHtml(username) + ",</h3>"
+                            + "<p>Your appointment has been approved.</p>"
+                            + "<p><strong>Requested time:</strong> " + escapeHtml(appointment.getStartTime().toString()) + "</p>"
+                            + "<p><strong>Location:</strong> " + escapeHtml(appointment.getMessage().getLocation()) + "</p>";
                 }
                 case REJECTED -> {
                     subject = "Appointment Rejected";
-                    body = "<h3>Hello " + username + ",</h3><p>Your appointment was rejected.</p>";
+                    body = "<h3>Hello " + escapeHtml(username) + ",</h3>"
+                            + "<p>Your appointment request was rejected. Please contact the church if you need help arranging another visit.</p>"
+                            + "<p><strong>Requested time:</strong> " + escapeHtml(appointment.getStartTime().toString()) + "</p>";
                 }
                 case COMPLETED -> {
                     subject = "Appointment Completed";
-                    body = "<h3>Hello " + username + ",</h3><p>Your appointment is completed.</p>";
+                    body = "<h3>Hello " + escapeHtml(username) + ",</h3>"
+                            + "<p>Your appointment has been marked as completed.</p>"
+                            + "<p><strong>Requested time:</strong> " + escapeHtml(appointment.getStartTime().toString()) + "</p>";
                 }
                 default -> throw new IllegalStateException("Unexpected appointment status: " + status);
             }
 
-            emailService.sendEmail(userEmail, subject, body);
+            eventPublisher.publishEvent(new NotificationEmailEvent(userEmail, subject, body));
         }
 
         return response;
@@ -164,7 +181,34 @@ public class AppointmentService {
         if (appointment.getMessage() != null) {
             appointment.getMessage().setStatus(MessageStatus.CLOSED);
         }
+        publishCancellationToAdmins(appointment);
         return mapToResponse(appointment);
+    }
+
+    private void publishCancellationToAdmins(Appointment appointment) {
+        String subject = "Appointment Cancelled";
+        String body = """
+                <h3>Appointment cancelled by member</h3>
+                <p><strong>Member:</strong> %s</p>
+                <p><strong>Email:</strong> %s</p>
+                <p><strong>Phone:</strong> %s</p>
+                <p><strong>Requested time:</strong> %s</p>
+                <p><strong>Location:</strong> %s</p>
+                """.formatted(
+                escapeHtml(appointment.getMessage().getUser().getUsername()),
+                escapeHtml(appointment.getMessage().getUser().getEmail()),
+                escapeHtml(appointment.getMessage().getPhone()),
+                escapeHtml(appointment.getStartTime().toString()),
+                escapeHtml(appointment.getMessage().getLocation())
+        );
+        userRepository.findAdminRecipients(
+                        List.of(Role.ROLE_ADMIN, Role.ROLE_SUPER_ADMIN), superAdminEmail)
+                .forEach(admin -> eventPublisher.publishEvent(
+                        new NotificationEmailEvent(admin.getEmail(), subject, body)));
+    }
+
+    private String escapeHtml(String value) {
+        return HtmlUtils.htmlEscape(value == null ? "-" : value);
     }
 
     private AppointmentResponse mapToResponse(Appointment appointment) {

@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class EmailService {
@@ -45,7 +48,8 @@ public class EmailService {
     //EMAIL VERIFICATION (BACKEND DIRECT)
     public void sendVerificationEmail(String toEmail, String token) {
 
-        String verifyLink = applicationBaseUrl + "/api/auth/verify?token=" + token;
+        String verifyLink = applicationBaseUrl + "/api/auth/verify?token="
+                + UriUtils.encodeQueryParam(token, StandardCharsets.UTF_8);
 
         String html = """
         <div style="font-family: Arial; padding: 20px;">
@@ -75,7 +79,8 @@ public class EmailService {
     //RESET PASSWORD (FRONTEND PAGE)
     public void sendPasswordResetEmail(String toEmail, String token) {
 
-        String resetLink = applicationBaseUrl + "/reset-password.html?token=" + token;
+        String resetLink = applicationBaseUrl + "/reset-password.html?token="
+                + UriUtils.encodeQueryParam(token, StandardCharsets.UTF_8);
 
         String html = """
         <div style="font-family: Arial; padding: 20px;">

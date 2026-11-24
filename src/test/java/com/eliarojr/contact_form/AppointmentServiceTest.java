@@ -8,15 +8,18 @@ import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.exception.BadRequestException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.service.AppointmentService;
-import com.eliarojr.contact_form.service.EmailService;
+import com.eliarojr.contact_form.event.NotificationEmailEvent;
+import com.eliarojr.contact_form.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -26,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,7 +37,8 @@ import static org.mockito.Mockito.when;
 class AppointmentServiceTest {
 
     @Mock private AppointmentRepository appointmentRepository;
-    @Mock private EmailService emailService;
+    @Mock private UserRepository userRepository;
+    @Mock private ApplicationEventPublisher eventPublisher;
     @InjectMocks private AppointmentService appointmentService;
 
     @AfterEach
@@ -52,7 +55,7 @@ class AppointmentServiceTest {
                 () -> appointmentService.updateStatus(1L, AppointmentStatus.COMPLETED));
 
         assertEquals(AppointmentStatus.PENDING, appointment.getStatus());
-        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     @Test
@@ -66,7 +69,10 @@ class AppointmentServiceTest {
         assertEquals(AppointmentStatus.APPROVED, appointment.getStatus());
         assertEquals(appointment.getStartTime(), appointment.getReservedSlot());
         assertEquals(MessageStatus.IN_PROGRESS, appointment.getMessage().getStatus());
-        verify(emailService).sendEmail(eq("member@example.com"), eq("Appointment Approved"), any());
+        ArgumentCaptor<NotificationEmailEvent> event = ArgumentCaptor.forClass(NotificationEmailEvent.class);
+        verify(eventPublisher).publishEvent(event.capture());
+        assertEquals("member@example.com", event.getValue().email());
+        assertEquals("Appointment Approved", event.getValue().subject());
     }
 
     @Test
@@ -100,7 +106,7 @@ class AppointmentServiceTest {
         assertThrows(BadRequestException.class, () -> appointmentService.cancelByCurrentUser(1L));
 
         assertEquals(AppointmentStatus.APPROVED, appointment.getStatus());
-        verify(emailService, never()).sendEmail(any(), any(), any());
+        verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
     private Appointment appointment(AppointmentStatus status) {

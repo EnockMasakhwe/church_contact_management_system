@@ -9,31 +9,26 @@ import com.eliarojr.contact_form.entity.enums.MessageStatus;
 import com.eliarojr.contact_form.entity.enums.MessageType;
 import com.eliarojr.contact_form.entity.enums.Role;
 import com.eliarojr.contact_form.entity.User;
+import com.eliarojr.contact_form.event.NotificationEmailEvent;
 import com.eliarojr.contact_form.exception.BadRequestException;
-import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.exception.UnauthorizedException;
 import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.MessageRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
-import com.eliarojr.contact_form.service.EmailService;
 import com.eliarojr.contact_form.service.AppointmentSchedule;
 import com.eliarojr.contact_form.service.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-
-import static com.eliarojr.contact_form.entity.enums.MessageType.VISITATION_REQUEST;
 import static org.hibernate.internal.util.StringHelper.isBlank;
 
 @Service
@@ -43,7 +38,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
-    private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${app.super-admin-email}")
     private String superAdminEmail;
@@ -128,21 +123,32 @@ public class MessageServiceImpl implements MessageService {
              <h3>New Message Submitted</h3>
              <p><strong>User:</strong> %s</p>
              <p><strong>Email:</strong> %s</p>
+             <p><strong>Phone:</strong> %s</p>
              <p><strong>Type:</strong> %s</p>
-             <p><strong>Message:</strong> %s</p>
+             <p><strong>Location:</strong> %s</p>
+             <p><strong>Requested time:</strong> %s</p>
+             <p><strong>Message:</strong><br>%s</p>
         """.formatted(
-                user.getUsername(),
-                user.getEmail(),
+                escapeHtml(user.getUsername()),
+                escapeHtml(user.getEmail()),
+                escapeHtml(request.getPhone()),
                 request.getType().name(),
-                request.getMessage()
+                escapeHtml(request.getLocation() == null ? "-" : request.getLocation()),
+                escapeHtml(request.getPreferredDateTime() == null ? "-" : request.getPreferredDateTime().toString()),
+                escapeHtml(request.getMessage()).replace("\n", "<br>")
         );
 
         List<Role> adminRoles = List.of(Role.ROLE_ADMIN, Role.ROLE_SUPER_ADMIN);
         userRepository.findAdminRecipients(adminRoles, superAdminEmail)
-                .forEach(admin -> emailService.sendEmail(admin.getEmail(), subject, body));
+                .forEach(admin -> eventPublisher.publishEvent(
+                        new NotificationEmailEvent(admin.getEmail(), subject, body)));
 
         //Response
         return mapToResponse(saved);
+    }
+
+    private String escapeHtml(String value) {
+        return HtmlUtils.htmlEscape(value == null ? "" : value);
     }
 
     //MAPPER
