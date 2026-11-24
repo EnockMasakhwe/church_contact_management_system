@@ -11,6 +11,7 @@ The application provides a digital channel for initiating contact and coordinati
 - Message submission with four categories: prayer request, visitation request, bereavement, and general.
 - A seven-day, daytime appointment calendar for selecting a requested visitation time.
 - Member dashboard for viewing their own messages and appointment requests.
+- Server-side pagination and filtering for member and administrator dashboard records.
 - Administrator dashboard for viewing, filtering, and managing messages, appointments, users, and summary statistics.
 - Email notifications for account verification, password resets, new submissions to administrators, and appointment status changes to members.
 - Public availability calendar that exposes appointment time and status, but not the member's identity or message.

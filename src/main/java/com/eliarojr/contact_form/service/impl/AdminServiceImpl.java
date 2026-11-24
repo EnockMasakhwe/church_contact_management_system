@@ -3,6 +3,7 @@ package com.eliarojr.contact_form.service.impl;
 import com.eliarojr.contact_form.dto.MessageResponse;
 import com.eliarojr.contact_form.entity.Message;
 import com.eliarojr.contact_form.entity.enums.MessageStatus;
+import com.eliarojr.contact_form.entity.enums.MessageType;
 import com.eliarojr.contact_form.exception.ResourceNotFoundException;
 import com.eliarojr.contact_form.repository.MessageRepository;
 import com.eliarojr.contact_form.service.AdminService;
@@ -10,8 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +23,12 @@ public class AdminServiceImpl implements AdminService {
     private final Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
 
     @Override
-    public List<MessageResponse> getAllMessages() {
-        log.info("Fetching all messages from DB WITH USER");
-
-        return messageRepository.findAllWithUser()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public Page<MessageResponse> getAllMessages(MessageStatus status, MessageType type,
+                                                String search, Pageable pageable) {
+        String normalizedSearch = search == null || search.isBlank() ? null : search.trim();
+        log.debug("Fetching paged messages");
+        return messageRepository.findAdminPage(status, type, normalizedSearch, pageable)
+                .map(this::mapToResponse);
     }
 
     @Override

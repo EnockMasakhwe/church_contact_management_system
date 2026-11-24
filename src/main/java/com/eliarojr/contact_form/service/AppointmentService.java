@@ -16,6 +16,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.util.HtmlUtils;
@@ -51,6 +53,15 @@ public class AppointmentService {
                         a.getMessage().getMessage()
                 ))
                 .toList();
+    }
+
+    public Page<AppointmentResponse> getAllAppointments(Pageable pageable) {
+        return appointmentRepository.findAllByOrderByStartTimeAsc(pageable)
+                .map(a -> new AppointmentResponse(
+                        a.getId(), a.getStartTime(), a.getEndTime(), a.getStatus().name(),
+                        a.getMessage().getUser().getUsername(),
+                        a.getMessage().getUser().getEmail(),
+                        a.getMessage().getMessage()));
     }
 
     //Public view

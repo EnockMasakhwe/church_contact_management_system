@@ -5,6 +5,8 @@ import com.eliarojr.contact_form.entity.enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -30,10 +32,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // for calendar display
     List<Appointment> findAllByOrderByStartTimeAsc();
+    Page<Appointment> findAllByOrderByStartTimeAsc(Pageable pageable);
     List<Appointment> findByStatusInAndReservedSlotIsNull(Collection<AppointmentStatus> statuses);
 
     //For user messages view
     List<Appointment> findByMessage_User_IdOrderByStartTimeAsc(Long userId);
+    Page<Appointment> findByMessage_User_IdOrderByStartTimeAsc(Long userId, Pageable pageable);
     Optional<Appointment> findByIdAndMessage_User_EmailIgnoreCase(Long id, String email);
     Long countByStatus(AppointmentStatus status);
 }

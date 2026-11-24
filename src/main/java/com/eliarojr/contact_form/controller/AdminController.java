@@ -14,6 +14,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import com.eliarojr.contact_form.entity.enums.MessageStatus;
+import com.eliarojr.contact_form.entity.enums.MessageType;
 
 import java.util.List;
 
@@ -28,8 +34,11 @@ public class AdminController {
     private final AdminUserService adminUserService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<AdminUserResponse>> getUsers() {
-        return ResponseEntity.ok(adminUserService.getUsers());
+    public ResponseEntity<Page<AdminUserResponse>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return ResponseEntity.ok(adminUserService.getUsers(pageable));
     }
 
     @PutMapping("/users/{id}/role")
@@ -48,8 +57,14 @@ public class AdminController {
     }
 
     @GetMapping("/messages")
-    public ResponseEntity<List<MessageResponse>> getAllMessages(){
-        return ResponseEntity.ok(adminService.getAllMessages());
+    public ResponseEntity<Page<MessageResponse>> getAllMessages(
+            @RequestParam(required = false) MessageStatus status,
+            @RequestParam(required = false) MessageType type,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return ResponseEntity.ok(adminService.getAllMessages(status, type, search, pageable));
     }
 
     @DeleteMapping("/messages/{id}")

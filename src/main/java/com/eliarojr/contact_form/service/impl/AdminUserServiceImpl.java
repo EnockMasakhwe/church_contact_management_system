@@ -16,9 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +35,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     private String superAdminEmail;
 
     @Override
-    public List<AdminUserResponse> getUsers() {
-        return userRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<AdminUserResponse> getUsers(Pageable pageable) {
+        return userRepository.findAllByOrderByCreatedAtDesc(pageable)
+                .map(this::toResponse);
     }
 
     @Override

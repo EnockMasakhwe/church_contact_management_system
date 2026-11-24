@@ -13,9 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -39,12 +38,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<MessageResponse> getMyMessages() {
+    public Page<MessageResponse> getMyMessages(Pageable pageable) {
 
         Long userId = getCurrentUserId();
 
-        return messageRepository.findByUser_IdOrderByCreatedAtDesc(userId)
-                .stream()
+        return messageRepository.findByUser_IdOrderByCreatedAtDesc(userId, pageable)
                 .map(msg -> new MessageResponse(
                         msg.getId(),
                         msg.getMessage(),
@@ -56,17 +54,15 @@ public class UserServiceImpl implements UserService {
                         msg.getUser().getUsername(),
                         msg.getUser().getEmail(),
                         msg.getCreatedAt()
-                ))
-                .toList();
+                ));
     }
 
     @Override
-    public List<AppointmentResponse> getMyAppointments() {
+    public Page<AppointmentResponse> getMyAppointments(Pageable pageable) {
 
         Long userId = getCurrentUserId();
 
-        return appointmentRepository.findByMessage_User_IdOrderByStartTimeAsc(userId)
-                .stream()
+        return appointmentRepository.findByMessage_User_IdOrderByStartTimeAsc(userId, pageable)
                 .map(a -> new AppointmentResponse(
                         a.getId(),
                         a.getStartTime(),
@@ -75,8 +71,7 @@ public class UserServiceImpl implements UserService {
                         null, // don't expose name again
                         null,
                         a.getMessage().getMessage()
-                ))
-                .toList();
+                ));
     }
 
     @Override

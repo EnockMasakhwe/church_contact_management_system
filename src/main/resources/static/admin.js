@@ -7,12 +7,13 @@ if (!token || (role !== "ROLE_ADMIN" && role !== "ROLE_SUPER_ADMIN")) {
     window.location.href = "login.html";
 }
 
-let allMessages = [];
 let filteredMessages = [];
+let usersPage = 0;
+let appointmentsPage = 0;
+const tablePageSize = 8;
 
 // pagination
 let currentPage = 1;
-const rowsPerPage = 8;
 
 document.addEventListener("DOMContentLoaded", () => {
     loadStats();
@@ -21,17 +22,23 @@ document.addEventListener("DOMContentLoaded", () => {
     loadUsers();
 });
 
-function loadUsers() {
-    apiFetch("/api/admin/users")
-        .then(users => displayUsers(users))
+function loadUsers(page = usersPage) {
+    usersPage = page;
+    const table = document.getElementById("usersTable");
+    table.innerHTML = `<tr><td class="loading-row" colspan="7">Loading users...</td></tr>`;
+    apiFetch(`/api/admin/users?page=${usersPage}&size=${tablePageSize}`)
+        .then(usersPageData => displayUsers(usersPageData))
         .catch(err => showToast(err.message, "error"));
 }
 
-function displayUsers(users) {
+function displayUsers(usersPageData) {
     const table = document.getElementById("usersTable");
     table.innerHTML = "";
+    const users = usersPageData.content || [];
 
-    users.forEach(user => {
+    if (users.length === 0) {
+        table.innerHTML = `<tr><td class="empty-row" colspan="7">No registered users found.</td></tr>`;
+    } else users.forEach(user => {
         const isProtectedSuperAdmin = user.role === "ROLE_SUPER_ADMIN";
         let actions = "";
 
@@ -57,6 +64,7 @@ function displayUsers(users) {
             </tr>
         `;
     });
+    renderTablePagination("usersPagination", usersPageData, loadUsers);
 }
 
 function updateUserRole(userId, nextRole) {
@@ -95,85 +103,89 @@ function escapeHtml(value) {
 }
 
 // LOAD MESSAGES
-function loadMessages() {
-    apiFetch("/api/admin/messages")
+function loadMessages(page = currentPage - 1) {
+    const search = document.getElementById("searchInput")?.value.trim();
+    const status = document.getElementById("statusFilter")?.value;
+    const type = document.getElementById("typeFilter")?.value;
+    const params = new URLSearchParams({
+        page: String(page),
+        size: String(tablePageSize)
+    });
+    if (search) params.set("search", search);
+    if (status) params.set("status", status);
+    if (type) params.set("type", type);
+
+    const table = document.getElementById("messageTable");
+    table.innerHTML = `<tr><td class="loading-row" colspan="9">Loading messages...</td></tr>`;
+    apiFetch(`/api/admin/messages?${params}`)
         .then(data => {
-            allMessages = data;
-            filteredMessages = data;
-            currentPage = 1;
-            displayMessages();
+            filteredMessages = data.content || [];
+            currentPage = data.number + 1;
+            displayMessages(data);
         })
         .catch(err => showToast(err.message, "error"));
 }
 
 // DISPLAY MESSAGES
-function displayMessages() {
+function displayMessages(pageData) {
     const table = document.getElementById("messageTable");
     table.innerHTML = "";
 
-    const start = (currentPage - 1) * rowsPerPage;
-    const paginated = filteredMessages.slice(start, start + rowsPerPage);
+    if (filteredMessages.length === 0) {
+        table.innerHTML = `<tr><td class="empty-row" colspan="9">No messages match your filters.</td></tr>`;
+    } else {
 
-    paginated.forEach(msg => {
+    filteredMessages.forEach(msg => {
         table.innerHTML += `
             <tr>
                 <td>${msg.id}</td>
-                <td>${msg.name || "-"}</td>
-                <td>${msg.email || "-"}</td>
-                <td>${msg.type}</td>
-                <td>${msg.message}</td>
-                <td>${msg.location || "-"}</td>
+                <td>${escapeHtml(msg.name)}</td>
+                <td>${escapeHtml(msg.email)}</td>
+                <td>${escapeHtml(msg.type)}</td>
+                <td>${escapeHtml(msg.message)}</td>
+                <td>${escapeHtml(msg.location)}</td>
                 <td>${formatDate(msg.preferredDateTime)}</td>
                 <td><span class="status ${msg.status}">${msg.status}</span></td>
                 <td>${buildActions(msg)}</td>
             </tr>
         `;
     });
-
-    renderPagination();
+    }
+    renderTablePagination("pagination", pageData, page => loadMessages(page));
 }
 
 // FILTER
 function filterMessages() {
-    const search = document.getElementById("searchInput").value.toLowerCase();
-    const status = document.getElementById("statusFilter").value;
-    const type = document.getElementById("typeFilter").value;
-
-    filteredMessages = allMessages.filter(msg => {
-        const matchesSearch =
-            msg.message?.toLowerCase().includes(search) ||
-            msg.name?.toLowerCase().includes(search) ||
-            msg.email?.toLowerCase().includes(search);
-
-        const matchesStatus = status ? msg.status === status : true;
-        const matchesType = type ? msg.type === type : true;
-
-        return matchesSearch && matchesStatus && matchesType;
-    });
-
     currentPage = 1;
-    displayMessages();
+    loadMessages(0);
 }
 
 // pagination UI
-function renderPagination() {
-    const totalPages = Math.ceil(filteredMessages.length / rowsPerPage);
-    const container = document.getElementById("pagination");
-    if (!container) return;
-
+function renderTablePagination(containerId, pageData, loadPage) {
+    const container = document.getElementById(containerId);
+    if (!container || !pageData) return;
     container.innerHTML = "";
+    if (pageData.totalPages <= 1) return;
 
-    for (let i = 1; i <= totalPages; i++) {
-        container.innerHTML += `
-            <button class="page-btn ${i === currentPage ? "active-page" : ""}"
-                onclick="goToPage(${i})">${i}</button>
-        `;
+    const previous = document.createElement("button");
+    previous.textContent = "Previous";
+    previous.disabled = pageData.first;
+    previous.onclick = () => loadPage(pageData.number - 1);
+    container.appendChild(previous);
+
+    for (let i = 0; i < pageData.totalPages; i++) {
+        const button = document.createElement("button");
+        button.textContent = i + 1;
+        button.className = i === pageData.number ? "active-page" : "";
+        button.onclick = () => loadPage(i);
+        container.appendChild(button);
     }
-}
 
-function goToPage(page) {
-    currentPage = page;
-    displayMessages();
+    const next = document.createElement("button");
+    next.textContent = "Next";
+    next.disabled = pageData.last;
+    next.onclick = () => loadPage(pageData.number + 1);
+    container.appendChild(next);
 }
 
 // ACTIONS
@@ -224,23 +236,29 @@ function deleteMessage(id) {
 }
 
 // APPOINTMENTS
-function loadAppointments() {
-    apiFetch("/api/admin/appointments")
+function loadAppointments(page = appointmentsPage) {
+    appointmentsPage = page;
+    const table = document.getElementById("appointmentTable");
+    table.innerHTML = `<tr><td class="loading-row" colspan="8">Loading appointments...</td></tr>`;
+    apiFetch(`/api/admin/appointments?page=${appointmentsPage}&size=${tablePageSize}`)
         .then(data => displayAppointments(data))
         .catch(err => showToast(err.message, "error"));
 }
 
-function displayAppointments(apps) {
+function displayAppointments(pageData) {
     const table = document.getElementById("appointmentTable");
     table.innerHTML = "";
+    const apps = pageData.content || [];
 
-    apps.forEach(app => {
+    if (apps.length === 0) {
+        table.innerHTML = `<tr><td class="empty-row" colspan="8">No appointments found.</td></tr>`;
+    } else apps.forEach(app => {
         table.innerHTML += `
             <tr>
                 <td>${app.id}</td>
-                <td>${app.name || "-"}</td>
-                <td>${app.email || "-"}</td>
-                <td>${app.message || "-"}</td>
+                <td>${escapeHtml(app.name)}</td>
+                <td>${escapeHtml(app.email)}</td>
+                <td>${escapeHtml(app.message)}</td>
                 <td>${formatDate(app.startTime)}</td>
                 <td>${formatDate(app.endTime)}</td>
                 <td><span class="status ${app.status}">${app.status}</span></td>
@@ -248,6 +266,7 @@ function displayAppointments(apps) {
             </tr>
         `;
     });
+    renderTablePagination("appointmentPagination", pageData, loadAppointments);
 }
 
 // APPOINTMENT ACTIONS

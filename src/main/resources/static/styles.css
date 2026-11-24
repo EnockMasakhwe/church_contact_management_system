@@ -506,6 +506,41 @@ form > * {
     background: #d9effa;
 }
 
+.table-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 8px 0 22px;
+}
+
+.table-pagination button {
+    min-width: 34px;
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+}
+
+.table-pagination button.active-page {
+    border-color: var(--blue);
+    background: var(--blue);
+    color: #fff;
+}
+
+.table-pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.loading-row,
+.empty-row {
+    height: 72px;
+    color: var(--muted);
+    text-align: center;
+}
+
 .toast-container {
     position: fixed;
     top: 12px;
