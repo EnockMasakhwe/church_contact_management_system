@@ -37,7 +37,8 @@ public class AdminController {
     public ResponseEntity<Page<AdminUserResponse>> getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(normalizePage(page), normalizeSize(size),
+                Sort.by("createdAt").descending());
         return ResponseEntity.ok(adminUserService.getUsers(pageable));
     }
 
@@ -63,7 +64,8 @@ public class AdminController {
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(normalizePage(page), normalizeSize(size),
+                Sort.by("createdAt").descending());
         return ResponseEntity.ok(adminService.getAllMessages(status, type, search, pageable));
     }
 
@@ -84,6 +86,14 @@ public class AdminController {
     @GetMapping("/stats")
     public AdminStatsResponse getStats() {
         return adminStatsService.getStats();
+    }
+
+    private int normalizePage(int page) {
+        return Math.max(page, 0);
+    }
+
+    private int normalizeSize(int size) {
+        return Math.min(Math.max(size, 1), 50);
     }
 
 }

@@ -24,7 +24,8 @@ public class AppointmentController {
     public Page<AppointmentResponse> getAllAppointments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").ascending());
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 50),
+                Sort.by("startTime").ascending());
         return appointmentService.getAllAppointments(pageable);
     }
 

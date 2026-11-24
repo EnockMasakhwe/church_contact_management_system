@@ -28,7 +28,8 @@ public class UserController {
     public Page<MessageResponse> getMyMessages(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(normalizePage(page), normalizeSize(size),
+                Sort.by("createdAt").descending());
         return userService.getMyMessages(pageable);
     }
 
@@ -36,12 +37,21 @@ public class UserController {
     public Page<AppointmentResponse> getMyAppointments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "8") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").ascending());
+        Pageable pageable = PageRequest.of(normalizePage(page), normalizeSize(size),
+                Sort.by("startTime").ascending());
         return userService.getMyAppointments(pageable);
     }
 
     @PutMapping("/appointments/{id}/cancel")
     public AppointmentResponse cancelAppointment(@PathVariable Long id) {
         return userService.cancelMyAppointment(id);
+    }
+
+    private int normalizePage(int page) {
+        return Math.max(page, 0);
+    }
+
+    private int normalizeSize(int size) {
+        return Math.min(Math.max(size, 1), 50);
     }
 }
