@@ -36,7 +36,7 @@ The application provides a digital channel for initiating contact and coordinati
 4. Administrators review submissions in the admin dashboard, update message or appointment statuses, and manage accounts. Super-administrators can also change account roles.
 5. The system emails administrators about new submissions. Members receive email when an appointment status changes. Message status changes are visible in the member dashboard but do not send a separate email.
 
-Appointment availability is presented in the browser for the next seven days, from 08:00 through 18:00. The backend validates that requested times are in the future and checks for conflicts when a request is submitted. A displayed slot is not a final booking: the appointment remains pending until an administrator approves or rejects it. The calendar marks pending and approved appointments as unavailable; the current backend conflict check considers all existing appointments, including rejected and completed ones.
+Appointment availability is presented in the browser for the next seven calendar days, with hourly start times from 08:00 through 18:00. The backend enforces the same schedule and checks for conflicts when a request is submitted. A displayed slot is not a final booking: the appointment remains pending until an administrator approves or rejects it. Pending and approved appointments reserve their start time; database uniqueness prevents concurrent requests from reserving the same slot. Rejected, completed, and member-cancelled appointments release their slot. Members can cancel a future pending or approved appointment from their dashboard. Admin transitions are limited to pending → approved/rejected and approved → completed.
 
 ## Requirements
 
@@ -180,7 +180,7 @@ All `/api/admin/**` endpoints require an administrator or super-administrator, e
 | `PUT` | `/api/admin/users/{id}/role` | Change a user's role; super-admin only; JSON body: `{"role":"ROLE_ADMIN"}` |
 | `GET` | `/api/admin/stats` | Get message and appointment counts |
 
-Message statuses are `NEW`, `READ`, `IN_PROGRESS`, `RESPONDED`, and `CLOSED`. Appointment statuses are `PENDING`, `APPROVED`, `REJECTED`, and `COMPLETED`. Updating an appointment also updates its associated message status for approval, rejection, and completion.
+Message statuses are `NEW`, `READ`, `IN_PROGRESS`, `RESPONDED`, and `CLOSED`. Appointment statuses are `PENDING`, `APPROVED`, `REJECTED`, `COMPLETED`, and `CANCELLED`. Updating an appointment also updates its associated message status for approval, rejection, completion, and member cancellation.
 
 ## Project layout
 

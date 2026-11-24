@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
@@ -29,8 +30,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // for calendar display
     List<Appointment> findAllByOrderByStartTimeAsc();
+    List<Appointment> findByStatusInAndReservedSlotIsNull(Collection<AppointmentStatus> statuses);
 
     //For user messages view
     List<Appointment> findByMessage_User_IdOrderByStartTimeAsc(Long userId);
+    Optional<Appointment> findByIdAndMessage_User_EmailIgnoreCase(Long id, String email);
     Long countByStatus(AppointmentStatus status);
 }

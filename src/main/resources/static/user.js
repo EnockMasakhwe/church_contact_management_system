@@ -74,9 +74,34 @@ function displayMyAppointments(apps) {
                 <td>${formatDate(app.startTime)}</td>
                 <td>${formatDate(app.endTime)}</td>
                 <td><span class="status ${app.status}">${app.status}</span></td>
+                <td>${canCancelAppointment(app) ? `<button class="action-btn delete-btn" onclick="cancelAppointment(${app.id})">Cancel</button>` : "-"}</td>
             </tr>
         `;
     });
+}
+
+function canCancelAppointment(appointment) {
+    return (appointment.status === "PENDING" || appointment.status === "APPROVED")
+        && new Date(appointment.startTime) > new Date();
+}
+
+async function cancelAppointment(appointmentId) {
+    if (!confirm("Cancel this appointment request? The time slot will become available to other members.")) {
+        return;
+    }
+
+    try {
+        await apiFetch(`/api/user/appointments/${appointmentId}/cancel`, { method: "PUT" });
+        showToast("Appointment cancelled", "success");
+        await loadMyAppointments();
+    } catch (err) {
+        if (err.status === 401) {
+            showToast("Session expired", "error");
+            setTimeout(logout, 1500);
+        } else {
+            showToast(err.message, "error");
+        }
+    }
 }
 
 function formatDate(date) {

@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(
+        name = "uk_appointment_reserved_slot",
+        columnNames = "reserved_slot"
+))
 public class Appointment {
 
     @Id
@@ -22,6 +26,9 @@ public class Appointment {
 
     @Column(nullable = false)
     private LocalDateTime endTime;
+
+    @Column(name = "reserved_slot")
+    private LocalDateTime reservedSlot;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

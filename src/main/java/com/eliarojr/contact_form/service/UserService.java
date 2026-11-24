@@ -8,4 +8,5 @@ import java.util.List;
 public interface UserService {
     List<MessageResponse> getMyMessages();
     List<AppointmentResponse> getMyAppointments();
+    AppointmentResponse cancelMyAppointment(Long appointmentId);
 }

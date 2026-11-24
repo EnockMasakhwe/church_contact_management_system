@@ -16,6 +16,7 @@ import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.MessageRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.service.EmailService;
+import com.eliarojr.contact_form.service.AppointmentSchedule;
 import com.eliarojr.contact_form.service.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -72,6 +74,7 @@ public class MessageServiceImpl implements MessageService {
             }
 
             LocalDateTime start = request.getPreferredDateTime();
+            AppointmentSchedule.validate(start, LocalDateTime.now());
             LocalDateTime end = start.plusHours(1);
 
             List<Appointment> conflicts =
@@ -107,10 +110,15 @@ public class MessageServiceImpl implements MessageService {
             Appointment appointment = new Appointment();
             appointment.setStartTime(start);
             appointment.setEndTime(start.plusHours(1));
+            appointment.setReservedSlot(start);
             appointment.setStatus(AppointmentStatus.PENDING);
             appointment.setMessage(saved);
 
-            appointmentRepository.save(appointment);
+            try {
+                appointmentRepository.saveAndFlush(appointment);
+            } catch (DataIntegrityViolationException exception) {
+                throw new BadRequestException("Selected time slot already booked");
+            }
         }
 
         // Notify all admins, including the configured superadmin.

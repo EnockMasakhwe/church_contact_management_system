@@ -455,6 +455,11 @@ tbody tr:hover {
     color: #536174;
 }
 
+.CANCELLED {
+    background: #edf0f4;
+    color: #536174;
+}
+
 .REJECTED {
     background: #fce9e8;
     color: #a63e39;

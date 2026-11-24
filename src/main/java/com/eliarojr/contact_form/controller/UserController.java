@@ -5,6 +5,8 @@ import com.eliarojr.contact_form.dto.MessageResponse;
 import com.eliarojr.contact_form.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,5 +27,10 @@ public class UserController {
     @GetMapping("/appointments")
     public List<AppointmentResponse> getMyAppointments() {
         return userService.getMyAppointments();
+    }
+
+    @PutMapping("/appointments/{id}/cancel")
+    public AppointmentResponse cancelAppointment(@PathVariable Long id) {
+        return userService.cancelMyAppointment(id);
     }
 }

@@ -8,6 +8,7 @@ import com.eliarojr.contact_form.repository.AppointmentRepository;
 import com.eliarojr.contact_form.repository.MessageRepository;
 import com.eliarojr.contact_form.repository.UserRepository;
 import com.eliarojr.contact_form.service.UserService;
+import com.eliarojr.contact_form.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final MessageRepository messageRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final AppointmentService appointmentService;
 
     private Long getCurrentUserId() {
         String email = ((UserDetails) SecurityContextHolder
@@ -75,5 +77,10 @@ public class UserServiceImpl implements UserService {
                         a.getMessage().getMessage()
                 ))
                 .toList();
+    }
+
+    @Override
+    public AppointmentResponse cancelMyAppointment(Long appointmentId) {
+        return appointmentService.cancelByCurrentUser(appointmentId);
     }
 }
